@@ -9,7 +9,6 @@ export type HumidityLevel = z.infer<typeof HumidityLevel>;
 export const PlantCreateInput = z.object({
   name: z.string().min(1).max(120),
   nickname: z.string().max(60).optional().nullable(),
-  photoUrl: z.string().url().or(z.string().startsWith("/")).optional().nullable(),
   description: z.string().max(2000).optional().nullable(),
   species: z.string().max(160).optional().nullable(),
   wateringFrequencyDays: z.number().int().min(1).max(365).default(7),
@@ -23,22 +22,6 @@ export type PlantCreateInput = z.infer<typeof PlantCreateInput>;
 
 export const PlantUpdateInput = PlantCreateInput.partial();
 export type PlantUpdateInput = z.infer<typeof PlantUpdateInput>;
-
-export const RecognizeInput = z.object({
-  imageBase64: z.string().min(100, "Image manquante ou trop petite"),
-});
-
-export const RecognitionSuggestion = z.object({
-  name: z.string(),
-  species: z.string().optional(),
-  description: z.string().optional(),
-  wateringFrequencyDays: z.number().int().min(1).max(365).optional(),
-  sunlightExposure: SunlightExposure.optional(),
-  humidity: HumidityLevel.optional(),
-  temperatureRange: z.string().optional(),
-  confidence: z.number().min(0).max(1).optional(),
-});
-export type RecognitionSuggestion = z.infer<typeof RecognitionSuggestion>;
 
 export const PushSubscribeInput = z.object({
   subscription: z.object({

@@ -1,11 +1,15 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { PushSubscribeInput } from "@/lib/zod-schemas";
+import { getSession } from "@/lib/auth/session";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
+  const session = await getSession();
+  if (!session) return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
+
   const json = await req.json().catch(() => null);
   const parsed = PushSubscribeInput.safeParse(json);
   if (!parsed.success) {
@@ -21,12 +25,14 @@ export async function POST(req: Request) {
       p256dh: subscription.keys.p256dh,
       auth: subscription.keys.auth,
       userAgent: userAgent ?? null,
+      userId: session.sub,
       ...prefs,
     },
     update: {
       p256dh: subscription.keys.p256dh,
       auth: subscription.keys.auth,
       userAgent: userAgent ?? null,
+      userId: session.sub,
       ...prefs,
     },
   });

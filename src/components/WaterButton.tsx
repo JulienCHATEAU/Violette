@@ -1,6 +1,7 @@
 "use client";
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { Droplet } from "lucide-react";
 
 export function WaterButton({ plantId }: { plantId: string }) {
   const router = useRouter();
@@ -26,10 +27,11 @@ export function WaterButton({ plantId }: { plantId: string }) {
     <button
       onClick={onClick}
       disabled={pending}
-      className="w-full rounded-2xl bg-leaf-600 hover:bg-leaf-700 text-white font-semibold py-4 text-lg shadow-sm disabled:opacity-60 transition"
+      className="w-full inline-flex items-center justify-center gap-2 rounded-2xl bg-violet-600 hover:bg-violet-700 text-white font-semibold py-4 text-lg shadow-soft disabled:opacity-60 transition"
       aria-live="polite"
     >
-      {done ? "💧 Arrosée !" : pending ? "Enregistrement…" : "💧 Je viens d'arroser"}
+      <Droplet size={22} strokeWidth={2} />
+      {done ? "Arrosée !" : pending ? "Enregistrement…" : "Je viens d'arroser"}
     </button>
   );
 }

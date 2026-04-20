@@ -4,14 +4,9 @@ const withPWA = nextPwa({
   dest: "public",
   register: true,
   skipWaiting: true,
-  disable: process.env.NODE_ENV === "development",
+  disable: process.env.DISABLE_PWA === "true",
   customWorkerDir: "worker",
   runtimeCaching: [
-    {
-      urlPattern: /^\/uploads\/.*/i,
-      handler: "CacheFirst",
-      options: { cacheName: "uploads", expiration: { maxEntries: 200, maxAgeSeconds: 60 * 60 * 24 * 30 } },
-    },
     {
       urlPattern: /^\/api\/plants\/?.*/i,
       handler: "NetworkFirst",
@@ -28,8 +23,6 @@ const withPWA = nextPwa({
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  images: { remotePatterns: [{ protocol: "https", hostname: "**" }] },
-  experimental: { serverActions: { bodySizeLimit: "8mb" } },
 };
 
 export default withPWA(nextConfig);

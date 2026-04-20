@@ -15,8 +15,8 @@ self.addEventListener("push", (event) => {
   const {
     title = "Violette",
     body = "",
-    icon = "/icons/icon-192.png",
-    badge = "/icons/icon-192.png",
+    icon,
+    badge,
     tag,
     url = "/",
     plantId,
@@ -24,14 +24,14 @@ self.addEventListener("push", (event) => {
 
   const options = {
     body,
-    icon,
-    badge,
     tag: tag || plantId || "violette",
     renotify: Boolean(tag || plantId),
     data: { url },
     vibrate: [120, 60, 120],
     lang: "fr",
   };
+  if (icon) options.icon = icon;
+  if (badge) options.badge = badge;
 
   event.waitUntil(self.registration.showNotification(title, options));
 });

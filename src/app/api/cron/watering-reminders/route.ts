@@ -8,7 +8,8 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
-const DEDUP_WINDOW_MS = 12 * 60 * 60 * 1000; // 12h
+const DEDUP_WINDOW_MS = 12 * 60 * 60 * 1000;
+const RECENT_TEMPLATE_WINDOW = 20;
 
 export async function POST(req: Request) {
   const auth = req.headers.get("x-cron-secret");
@@ -24,11 +25,6 @@ export async function POST(req: Request) {
 
   if (!duePlants.length) return NextResponse.json({ ok: true, due: 0, sent: 0 });
 
-  const subs = await prisma.pushSubscription.findMany({ where: { wateringRemindersEnabled: true } });
-  const activeSubs = subs.filter((s) => !isQuietNow(s.quietHoursStart, s.quietHoursEnd));
-
-  if (!activeSubs.length) return NextResponse.json({ ok: true, due: duePlants.length, sent: 0, reason: "quiet_hours" });
-
   const dedupSince = new Date(now - DEDUP_WINDOW_MS);
   let sent = 0;
 
@@ -39,13 +35,30 @@ export async function POST(req: Request) {
     });
     if (recent) continue;
 
-    const { title, body, source } = await generatePlantMessage(plant, "watering_due");
+    const ownerSubs = await prisma.pushSubscription.findMany({
+      where: { userId: plant.ownerId, wateringRemindersEnabled: true },
+    });
+    const activeSubs = ownerSubs.filter((s) => !isQuietNow(s.quietHoursStart, s.quietHoursEnd));
+    if (!activeSubs.length) continue;
+
+    const recentTemplates = await prisma.pushMessage.findMany({
+      where: { plant: { ownerId: plant.ownerId }, kind: "watering_due", templateId: { not: null } },
+      orderBy: { sentAt: "desc" },
+      take: RECENT_TEMPLATE_WINDOW,
+      select: { templateId: true },
+    });
+    const recentIds = recentTemplates
+      .map((m) => m.templateId)
+      .filter((v): v is string => !!v);
+
+    const msg = generatePlantMessage(plant, "watering_due", { recentIds });
+    if (!msg) continue;
 
     const results = await Promise.all(
       activeSubs.map((s) =>
         sendPushTo(s, {
-          title,
-          body,
+          title: msg.title,
+          body: msg.body,
           url: `/plants/${plant.id}`,
           plantId: plant.id,
           tag: `water-${plant.id}`,
@@ -56,7 +69,12 @@ export async function POST(req: Request) {
     if (ok) {
       sent += 1;
       await prisma.pushMessage.create({
-        data: { plantId: plant.id, kind: "watering_due", body: `${title} — ${body}`, source },
+        data: {
+          plantId: plant.id,
+          kind: "watering_due",
+          body: `${msg.title} — ${msg.body}`,
+          templateId: msg.templateId,
+        },
       });
     }
   }
@@ -64,5 +82,4 @@ export async function POST(req: Request) {
   return NextResponse.json({ ok: true, due: duePlants.length, sent });
 }
 
-// Vercel Cron uses GET; allow both
 export const GET = POST;

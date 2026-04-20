@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import { Bell, BellOff, Send } from "lucide-react";
 
 type PermState = "default" | "granted" | "denied" | "unsupported";
 
@@ -23,8 +24,86 @@ export function NotificationPermission() {
       setState("unsupported");
       return;
     }
-    setState(Notification.permission as PermState);
+    const current = Notification.permission as PermState;
+    setState(current);
+
+    // If permission was granted in a previous session, ensure the server has
+    // the subscription registered for the current user.
+    if (current === "granted") {
+      void syncSubscription();
+    }
   }, []);
+
+  const syncSubscription = async (): Promise<boolean> => {
+    console.log("[push] sync → start");
+    try {
+      const vapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+      console.log("[push] vapidKey present?", !!vapidKey, "length:", vapidKey?.length);
+      if (!vapidKey) {
+        setMsg("VAPID key absente côté client.");
+        return false;
+      }
+      if (!("serviceWorker" in navigator)) {
+        setMsg("Service worker non supporté.");
+        return false;
+      }
+      let reg = await navigator.serviceWorker.getRegistration("/");
+      console.log("[push] getRegistration →", reg?.scope ?? "none");
+      if (!reg) {
+        console.log("[push] registering /sw.js manually…");
+        reg = await navigator.serviceWorker.register("/sw.js", { scope: "/" });
+      }
+      if (!reg.active) {
+        console.log("[push] waiting for SW to activate…");
+        await new Promise<void>((resolve, reject) => {
+          const sw = reg!.installing ?? reg!.waiting;
+          if (!sw) return resolve();
+          const timer = setTimeout(() => reject(new Error("SW activation timeout")), 10_000);
+          sw.addEventListener("statechange", () => {
+            console.log("[push] SW state:", sw.state);
+            if (sw.state === "activated") {
+              clearTimeout(timer);
+              resolve();
+            } else if (sw.state === "redundant") {
+              clearTimeout(timer);
+              reject(new Error("SW became redundant"));
+            }
+          });
+        });
+      }
+      console.log("[push] SW ready, active:", !!reg.active);
+      let sub = await reg.pushManager.getSubscription();
+      console.log("[push] existing subscription?", !!sub);
+      if (!sub) {
+        console.log("[push] calling pushManager.subscribe…");
+        sub = await reg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(vapidKey) as unknown as BufferSource,
+        });
+        console.log("[push] subscribed, endpoint:", sub.endpoint.slice(0, 60));
+      }
+      console.log("[push] POST /api/push/subscribe…");
+      const res = await fetch("/api/push/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          subscription: sub.toJSON(),
+          userAgent: navigator.userAgent,
+        }),
+      });
+      console.log("[push] subscribe response:", res.status);
+      if (!res.ok) {
+        const text = await res.text().catch(() => "");
+        setMsg(`Sync subscription échoué : HTTP ${res.status} ${text}`);
+        return false;
+      }
+      return true;
+    } catch (err) {
+      console.error("[push] sync failed", err);
+      setMsg(`Erreur sync push : ${(err as Error).message}`);
+      return false;
+    }
+  };
 
   const enable = async () => {
     setBusy(true);
@@ -38,7 +117,7 @@ export function NotificationPermission() {
       }
       const vapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
       if (!vapidKey) {
-        setMsg("VAPID public key manquante côté client. Ajoute NEXT_PUBLIC_VAPID_PUBLIC_KEY dans .env.");
+        setMsg("VAPID public key manquante côté client.");
         return;
       }
       const reg = await navigator.serviceWorker.ready;
@@ -56,7 +135,7 @@ export function NotificationPermission() {
         }),
       });
       if (!res.ok) throw new Error("subscribe failed");
-      setMsg("✨ Notifications activées ! Tes plantes vont pouvoir te parler 🌿");
+      setMsg("Notifications activées ! Tes plantes vont pouvoir te parler 🌿");
     } catch (err) {
       console.error(err);
       setMsg("Erreur d'activation. Réessaie.");
@@ -68,8 +147,13 @@ export function NotificationPermission() {
   const sendTest = async () => {
     setBusy(true);
     setMsg(null);
-    const res = await fetch("/api/push/test", { method: "POST" });
-    setMsg(res.ok ? "Test envoyé 📬" : "Aucune subscription trouvée.");
+    let res = await fetch("/api/push/test", { method: "POST" });
+    if (res.status === 404) {
+      // No subscription for this user — try to sync then retry once.
+      const ok = await syncSubscription();
+      if (ok) res = await fetch("/api/push/test", { method: "POST" });
+    }
+    setMsg(res.ok ? "Test envoyé 📬" : `Échec (HTTP ${res.status}). Voir console.`);
     setBusy(false);
   };
 
@@ -106,8 +190,9 @@ export function NotificationPermission() {
           <button
             onClick={enable}
             disabled={busy}
-            className="rounded-xl bg-leaf-600 hover:bg-leaf-700 text-white font-semibold px-4 py-2 disabled:opacity-60"
+            className="inline-flex items-center gap-1.5 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-semibold px-4 py-2 disabled:opacity-60 transition"
           >
+            <Bell size={16} strokeWidth={2} />
             {busy ? "…" : "Activer les notifications"}
           </button>
         )}
@@ -116,22 +201,24 @@ export function NotificationPermission() {
             <button
               onClick={sendTest}
               disabled={busy}
-              className="rounded-xl border px-4 py-2 font-medium"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-violet-200 text-violet-700 hover:bg-violet-50 px-4 py-2 font-medium transition"
             >
+              <Send size={16} strokeWidth={2} />
               Envoyer un test
             </button>
             <button
               onClick={unsubscribe}
               disabled={busy}
-              className="rounded-xl border border-red-300 text-red-700 px-4 py-2 font-medium"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-rose-200 text-rose-700 hover:bg-rose-50 px-4 py-2 font-medium transition"
             >
+              <BellOff size={16} strokeWidth={2} />
               Désactiver
             </button>
           </>
         )}
       </div>
       {state === "denied" && (
-        <p className="text-sm text-red-700">
+        <p className="text-sm text-rose-700">
           Les notifications sont bloquées. Ouvre les réglages du site dans ton navigateur et autorise-les.
         </p>
       )}

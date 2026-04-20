@@ -27,13 +27,13 @@ export function statusLabel(s: WateringStatus): string {
 export function statusColor(s: WateringStatus): string {
   switch (s) {
     case "overdue":
-      return "bg-red-100 text-red-800 border-red-200";
+      return "bg-rose-100 text-rose-800 border-rose-200";
     case "due":
-      return "bg-orange-100 text-orange-800 border-orange-200";
+      return "bg-amber-100 text-amber-800 border-amber-200";
     case "soon":
       return "bg-amber-50 text-amber-800 border-amber-200";
     case "ok":
-      return "bg-leaf-100 text-leaf-700 border-leaf-200";
+      return "bg-sage-100 text-sage-700 border-sage-200";
   }
 }
 

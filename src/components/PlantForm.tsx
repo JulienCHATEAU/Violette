@@ -1,12 +1,11 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { PhotoUpload } from "./PhotoUpload";
 import type { PlantCreateInput } from "@/lib/zod-schemas";
 
 type Mode = "create" | "edit";
 
-export type PlantFormValues = Partial<PlantCreateInput> & { photoUrl?: string | null };
+export type PlantFormValues = Partial<PlantCreateInput>;
 
 export function PlantForm({
   mode,
@@ -20,7 +19,6 @@ export function PlantForm({
   const router = useRouter();
   const [pending, start] = useTransition();
   const [error, setError] = useState<string | null>(null);
-  const [recoNote, setRecoNote] = useState<string | null>(null);
 
   const [values, setValues] = useState<PlantFormValues>({
     name: "",
@@ -32,7 +30,6 @@ export function PlantForm({
     humidity: "medium",
     temperatureRange: "",
     notes: "",
-    photoUrl: null,
     ...initial,
   });
 
@@ -78,42 +75,6 @@ export function PlantForm({
 
   return (
     <form onSubmit={onSubmit} className="space-y-4">
-      {mode === "create" && (
-        <section className="space-y-2">
-          <h2 className="font-semibold">Photo (facultatif)</h2>
-          <PhotoUpload
-            onRecognized={({ url, suggestion, source }) => {
-              set("photoUrl", url);
-              if (!suggestion) {
-                setRecoNote("Plante non reconnue — remplis manuellement 😉");
-                return;
-              }
-              setRecoNote(
-                `Reconnu via ${source === "plant-id" ? "Plant.id" : "Claude Vision"}${
-                  suggestion.confidence ? ` (${Math.round((suggestion.confidence ?? 0) * 100)}%)` : ""
-                }. Vérifie puis enregistre.`,
-              );
-              setValues((prev) => ({
-                ...prev,
-                name: suggestion.name || prev.name,
-                species: suggestion.species ?? prev.species ?? "",
-                description: suggestion.description ?? prev.description ?? "",
-                wateringFrequencyDays:
-                  suggestion.wateringFrequencyDays ?? prev.wateringFrequencyDays ?? 7,
-                sunlightExposure: suggestion.sunlightExposure ?? prev.sunlightExposure,
-                humidity: suggestion.humidity ?? prev.humidity,
-                temperatureRange: suggestion.temperatureRange ?? prev.temperatureRange ?? "",
-              }));
-            }}
-          />
-          {recoNote && (
-            <p className="text-sm text-leaf-700 bg-leaf-50 border border-leaf-200 rounded-lg px-3 py-2">
-              {recoNote}
-            </p>
-          )}
-        </section>
-      )}
-
       <div>
         <label className="block text-sm font-medium mb-1" htmlFor="name">Nom *</label>
         <input
@@ -237,7 +198,7 @@ export function PlantForm({
         <button
           type="submit"
           disabled={pending}
-          className="flex-1 rounded-xl bg-leaf-600 hover:bg-leaf-700 text-white font-semibold px-4 py-3 disabled:opacity-60"
+          className="flex-1 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-semibold px-4 py-3 disabled:opacity-60 shadow-soft transition"
         >
           {pending ? "Enregistrement…" : mode === "create" ? "Créer" : "Mettre à jour"}
         </button>
@@ -248,7 +209,7 @@ export function PlantForm({
           type="button"
           onClick={onDelete}
           disabled={pending}
-          className="w-full rounded-xl border border-red-300 text-red-700 py-3 font-medium mt-4"
+          className="w-full rounded-xl border border-rose-300 text-rose-700 hover:bg-rose-50 py-3 font-medium mt-4 transition"
         >
           Supprimer cette plante
         </button>

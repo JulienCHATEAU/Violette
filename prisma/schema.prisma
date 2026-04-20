@@ -1,5 +1,5 @@
 // Violette — schéma Prisma
-// Run:  npx prisma migrate dev --name init
+// Run:  npx prisma migrate dev --name <name>
 
 datasource db {
   provider = "sqlite"
@@ -10,24 +10,40 @@ generator client {
   provider = "prisma-client-js"
 }
 
+model User {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  plants            Plant[]
+  pushSubscriptions PushSubscription[]
+}
+
 model Plant {
   id                    String   @id @default(cuid())
   name                  String
   nickname              String?
-  photoUrl              String?
   description           String?
   species               String?
   wateringFrequencyDays Int      @default(7)
   lastWateredAt         DateTime @default(now())
-  sunlightExposure      String   @default("indirect_light") // full_sun | partial_shade | shade | indirect_light
-  humidity              String   @default("medium")          // low | medium | high
+  sunlightExposure      String   @default("indirect_light")
+  humidity              String   @default("medium")
   temperatureRange      String?
   notes                 String?
+  photo                 Bytes?
+  photoMime             String?
   createdAt             DateTime @default(now())
   updatedAt             DateTime @updatedAt
 
+  ownerId       String
+  owner         User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   wateringLogs  WateringLog[]
   pushMessages  PushMessage[]
+
+  @@index([ownerId])
 }
 
 model WateringLog {
@@ -53,16 +69,22 @@ model PushSubscription {
   greetingsPerDay          Int     @default(1)
   quietHoursStart          Int?    @default(22)
   quietHoursEnd            Int?    @default(8)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model PushMessage {
-  id        String   @id @default(cuid())
-  plantId   String?
-  plant     Plant?   @relation(fields: [plantId], references: [id], onDelete: SetNull)
-  kind      String   // watering_due | greeting
-  body      String
-  sentAt    DateTime @default(now())
-  source    String   // llm | template
+  id         String   @id @default(cuid())
+  plantId    String?
+  plant      Plant?   @relation(fields: [plantId], references: [id], onDelete: SetNull)
+  kind       String   // watering_due | greeting
+  body       String
+  sentAt     DateTime @default(now())
+  templateId String?
 
   @@index([plantId, kind, sentAt])
+  @@index([templateId, sentAt])
 }

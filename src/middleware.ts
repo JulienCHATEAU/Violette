@@ -1,28 +1,46 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { SESSION_COOKIE, verifySession } from "@/lib/auth/session";
 
-export function middleware(req: NextRequest) {
-  const user = process.env.BASIC_AUTH_USER;
-  const pass = process.env.BASIC_AUTH_PASSWORD;
+const PUBLIC_PREFIXES = [
+  "/login",
+  "/api/auth/",
+  "/api/cron/",
+  "/_next/",
+  "/icons/",
+  "/manifest.json",
+  "/sw.js",
+  "/workbox-",
+  "/worker-",
+];
 
-  // Si non configuré (dev local), désactivé.
-  if (!user || !pass) return NextResponse.next();
+function isPublic(pathname: string): boolean {
+  return PUBLIC_PREFIXES.some((p) => pathname === p || pathname.startsWith(p));
+}
 
-  const auth = req.headers.get("authorization");
-  if (auth?.startsWith("Basic ")) {
-    const [u, p] = atob(auth.slice(6)).split(":");
-    if (u === user && p === pass) return NextResponse.next();
+export async function middleware(req: NextRequest) {
+  const { pathname } = req.nextUrl;
+  if (isPublic(pathname)) return NextResponse.next();
+
+  const token = req.cookies.get(SESSION_COOKIE)?.value;
+  const session = token ? await verifySession(token) : null;
+
+  if (!session) {
+    if (pathname.startsWith("/api/")) {
+      return NextResponse.json({ error: "unauthenticated" }, { status: 401 });
+    }
+    const url = req.nextUrl.clone();
+    url.pathname = "/login";
+    url.searchParams.set("from", pathname);
+    return NextResponse.redirect(url);
   }
 
-  return new NextResponse("Auth required", {
-    status: 401,
-    headers: { "WWW-Authenticate": 'Basic realm="Violette"' },
-  });
+  return NextResponse.next();
 }
 
 export const config = {
-  // Exempte : /api/cron (protégé par x-cron-secret), SW, manifest, icônes, Next static
   matcher: [
-    "/((?!api/cron|_next/static|_next/image|icons/|manifest.json|sw\\.js|workbox-|worker-).*)",
+    // Match everything except static files detected by extension
+    "/((?!.*\\.(?:png|jpg|jpeg|svg|ico|webmanifest|txt)$).*)",
   ],
 };
