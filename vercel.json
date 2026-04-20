@@ -1,0 +1,6 @@
+{
+  "crons": [
+    { "path": "/api/cron/watering-reminders", "schedule": "5 * * * *" },
+    { "path": "/api/cron/random-greeting", "schedule": "0 11,17 * * *" }
+  ]
+}

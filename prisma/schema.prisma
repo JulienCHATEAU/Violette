@@ -1,0 +1,68 @@
+// Violette — schéma Prisma
+// Run:  npx prisma migrate dev --name init
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Plant {
+  id                    String   @id @default(cuid())
+  name                  String
+  nickname              String?
+  photoUrl              String?
+  description           String?
+  species               String?
+  wateringFrequencyDays Int      @default(7)
+  lastWateredAt         DateTime @default(now())
+  sunlightExposure      String   @default("indirect_light") // full_sun | partial_shade | shade | indirect_light
+  humidity              String   @default("medium")          // low | medium | high
+  temperatureRange      String?
+  notes                 String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  wateringLogs  WateringLog[]
+  pushMessages  PushMessage[]
+}
+
+model WateringLog {
+  id        String   @id @default(cuid())
+  plantId   String
+  plant     Plant    @relation(fields: [plantId], references: [id], onDelete: Cascade)
+  wateredAt DateTime @default(now())
+  note      String?
+
+  @@index([plantId, wateredAt])
+}
+
+model PushSubscription {
+  id        String   @id @default(cuid())
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  wateringRemindersEnabled Boolean @default(true)
+  greetingsEnabled         Boolean @default(true)
+  greetingsPerDay          Int     @default(1)
+  quietHoursStart          Int?    @default(22)
+  quietHoursEnd            Int?    @default(8)
+}
+
+model PushMessage {
+  id        String   @id @default(cuid())
+  plantId   String?
+  plant     Plant?   @relation(fields: [plantId], references: [id], onDelete: SetNull)
+  kind      String   // watering_due | greeting
+  body      String
+  sentAt    DateTime @default(now())
+  source    String   // llm | template
+
+  @@index([plantId, kind, sentAt])
+}

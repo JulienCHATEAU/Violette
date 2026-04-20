@@ -1,0 +1,22 @@
+{
+  "name": "Violette",
+  "short_name": "Violette",
+  "description": "Mes plantes, leurs soins et leurs petits messages.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f7faf6",
+  "theme_color": "#2d8630",
+  "lang": "fr",
+  "categories": ["lifestyle", "productivity"],
+  "icons": [
+    { "src": "/icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Ajouter une plante", "url": "/plants/new", "short_name": "Ajouter" },
+    { "name": "Tableau de bord", "url": "/", "short_name": "Accueil" }
+  ]
+}
