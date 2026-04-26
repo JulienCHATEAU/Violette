@@ -12,3 +12,4 @@ export { Home } from "./Home";
 export { PlantPot } from "./PlantPot";
 export { Sparkles } from "./Sparkles";
 export { Settings } from "./Settings";
+export { Trash } from "./Trash";

@@ -15,6 +15,7 @@ const NAV: ReadonlyArray<NavItem> = [
   { href: "/design-system/cards", label: "Cards" },
   { href: "/design-system/inputs", label: "Inputs" },
   { href: "/design-system/badges", label: "Badges" },
+  { href: "/design-system/dialogs", label: "Dialogs" },
   { href: "/design-system/bubbles", label: "Plant bubbles" },
   { href: "/design-system/icons", label: "Icons" },
   { href: "/design-system/motion", label: "Motion" },

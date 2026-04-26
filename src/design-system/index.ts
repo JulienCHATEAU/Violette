@@ -40,6 +40,8 @@ export { PlantBubble } from "./components/PlantBubble";
 export type { PlantBubbleProps, BubblePosition, BubbleSize } from "./components/PlantBubble";
 export { WaterCTA } from "./components/WaterCTA";
 export type { WaterCTAProps, WaterCTAState, WaterCTASize } from "./components/WaterCTA";
+export { ConfirmDialog } from "./components/Dialog";
+export type { ConfirmDialogProps } from "./components/Dialog";
 
 // Icons
 export * from "./icons";

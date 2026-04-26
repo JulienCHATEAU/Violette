@@ -13,6 +13,7 @@ import {
   PlantPot,
   Sparkles,
   Settings,
+  Trash,
 } from "@/design-system/icons";
 
 const ICONS = [
@@ -29,6 +30,7 @@ const ICONS = [
   { name: "PlantPot", Comp: PlantPot },
   { name: "Sparkles", Comp: Sparkles },
   { name: "Settings", Comp: Settings },
+  { name: "Trash", Comp: Trash },
 ] as const;
 
 export default function IconsPage() {

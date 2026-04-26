@@ -1,20 +1,42 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { ChevronLeft, Droplet, Info, Leaf, NotebookText, Sun, Thermometer, Wind } from "lucide-react";
 import { prisma } from "@/lib/db";
-import { WaterButton } from "@/components/WaterButton";
+import { WaterAction } from "@/components/WaterAction";
 import { PhotoUpload } from "@/components/PhotoUpload";
-import {
-  computeWatering,
-  statusColor,
-  statusLabel,
-  SUNLIGHT_LABEL,
-  HUMIDITY_LABEL,
-} from "@/lib/watering";
+import { computeWatering, SUNLIGHT_LABEL, HUMIDITY_LABEL, type WateringStatus } from "@/lib/watering";
 import { getSession } from "@/lib/auth/session";
+import { Card } from "@/design-system/components/Card";
+import { Badge } from "@/design-system/components/Badge";
+import { Button } from "@/design-system/components/Button";
+import { H1, H3, Body, Caption, Italic, Label } from "@/design-system/components/Typography";
+import { ArrowLeft, Cloud, Droplet, Leaf, Sun, Thermometer } from "@/design-system/icons";
 
 export const dynamic = "force-dynamic";
 
+const STATUS_TO_BADGE: Record<WateringStatus, "urgent" | "soon" | "ok"> = {
+  overdue: "urgent",
+  due: "urgent",
+  soon: "soon",
+  ok: "ok",
+};
+
+const STATUS_LABEL: Record<WateringStatus, string> = {
+  overdue: "En retard",
+  due: "Aujourd'hui",
+  soon: "Demain",
+  ok: "OK",
+};
+
+/**
+ * Plant detail — single-plant page with the watering peak moment.
+ *
+ * Laws of UX:
+ *  - Peak-End Rule: WaterAction (DS WaterCTA + celebration overlay) is the
+ *    high point of the journey.
+ *  - Law of Common Region: each block is its own organic Card.
+ *  - Law of Proximity: photo, name, status and the action button stack tightly.
+ *  - Aesthetic-Usability: organic radii, paper-grain placeholder, italic species.
+ */
 export default async function PlantDetailPage({ params }: { params: { id: string } }) {
   const session = await getSession();
   if (!session) redirect("/login");
@@ -33,107 +55,117 @@ export default async function PlantDetailPage({ params }: { params: { id: string
 
   return (
     <div className="space-y-6">
+      {/* Top bar */}
       <div className="flex items-center justify-between">
         <Link
           href="/plants"
-          aria-label="Retour"
-          className="inline-flex items-center text-violet-700 dark:text-violet-300"
+          aria-label="Retour à la liste"
+          className="inline-flex items-center justify-center w-11 h-11 rounded-full bg-paper-50 border border-paper-200 text-ink-600 shadow-paper hover:bg-paper-100 transition-colors duration-180 ease-organic focus:outline-none focus-visible:ring-4 focus-visible:ring-terracotta-500/20"
         >
-          <ChevronLeft size={24} strokeWidth={1.8} />
+          <ArrowLeft size={20} />
         </Link>
-        <Link href={`/plants/${plant.id}/edit`} className="text-sm text-violet-700 dark:text-violet-300">
-          Modifier
+        <Link href={`/plants/${plant.id}/edit`}>
+          <Button variant="ghost" size="sm">Modifier</Button>
         </Link>
       </div>
 
-      <div className="rounded-2xl overflow-hidden border border-sage-100 bg-white dark:bg-zinc-900 shadow-soft">
-        <div className="aspect-[4/3] bg-sage-50 dark:bg-sage-900/20 relative">
+      {/* Hero card */}
+      <Card radius="organic-1" elevation="paper" padding="none" className="overflow-hidden">
+        <div className="aspect-[4/3] bg-paper-100 paper-grain relative">
           {photoUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={photoUrl} alt={title} className="w-full h-full object-cover" />
+            <img src={photoUrl} alt={title} className="absolute inset-0 w-full h-full object-cover" />
           ) : (
-            <div className="w-full h-full grid place-items-center text-sage-400" aria-hidden>
-              <Leaf size={72} strokeWidth={1.2} />
+            <div className="absolute inset-0 grid place-items-center text-moss-400" aria-hidden="true">
+              <Leaf size={72} />
             </div>
           )}
         </div>
         <div className="p-5 space-y-3">
           <div>
-            <h1 className="text-2xl font-bold">{title}</h1>
-            {plant.nickname && plant.name !== plant.nickname && (
-              <div className="text-sm text-zinc-500">{plant.name}</div>
-            )}
-            {plant.species && <div className="text-xs italic text-zinc-500">{plant.species}</div>}
+            <H1 className="text-3xl">{title}</H1>
+            {plant.nickname && plant.name !== plant.nickname ? (
+              <Caption className="mt-0.5">{plant.name}</Caption>
+            ) : null}
+            {plant.species ? (
+              <p className="mt-0.5">
+                <Italic className="text-sm text-ink-400">{plant.species}</Italic>
+              </p>
+            ) : null}
           </div>
-          <span
-            className={`inline-block text-xs px-2 py-0.5 rounded-full border ${statusColor(w.status)}`}
-          >
-            {statusLabel(w.status)}
-          </span>
-          <p className="text-sm text-zinc-600 dark:text-zinc-300">
+          <div>
+            <Badge variant={STATUS_TO_BADGE[w.status]}>{STATUS_LABEL[w.status]}</Badge>
+          </div>
+          <Body className="text-sm text-ink-600">
             Dernier arrosage il y a {daysSince}j • prochain{" "}
             {w.diffDays < 0 ? `en retard de ${Math.abs(w.diffDays)}j` : `dans ${w.diffDays}j`}
-          </p>
+          </Body>
           <PhotoUpload plantId={plant.id} hasPhoto={hasPhoto} />
         </div>
-      </div>
+      </Card>
 
-      <WaterButton plantId={plant.id} />
+      {/* Peak moment */}
+      <WaterAction plantId={plant.id} plantName={title} />
 
-      <section className="rounded-2xl border border-sage-100 bg-white dark:bg-zinc-900 p-5 space-y-4 shadow-soft">
-        <h2 className="flex items-center gap-2 font-semibold text-sage-700">
-          <Info size={18} strokeWidth={2} />
-          Fiche
-        </h2>
-        <dl className="grid grid-cols-2 gap-4 text-sm">
-          <Detail icon={<Droplet size={16} className="text-violet-600" />} label="Arrosage">
+      {/* Care sheet */}
+      <Card radius="organic-2" elevation="paper" padding="lg" className="space-y-5">
+        <div className="flex items-center gap-2">
+          <Leaf size={18} className="text-moss-500" />
+          <H3>Fiche</H3>
+        </div>
+        <dl className="grid grid-cols-2 gap-5">
+          <Detail icon={<Droplet size={16} className="text-terracotta-500" />} label="Arrosage">
             Tous les {plant.wateringFrequencyDays}j
           </Detail>
-          <Detail icon={<Sun size={16} className="text-amber-500" />} label="Exposition">
+          <Detail icon={<Sun size={16} className="text-terracotta-400" />} label="Exposition">
             {SUNLIGHT_LABEL[plant.sunlightExposure] ?? plant.sunlightExposure}
           </Detail>
-          <Detail icon={<Wind size={16} className="text-sky-500" />} label="Humidité">
+          <Detail icon={<Cloud size={16} className="text-moss-500" />} label="Humidité">
             {HUMIDITY_LABEL[plant.humidity] ?? plant.humidity}
           </Detail>
-          <Detail icon={<Thermometer size={16} className="text-rose-500" />} label="Température">
+          <Detail icon={<Thermometer size={16} className="text-terracotta-500" />} label="Température">
             {plant.temperatureRange ?? "—"}
           </Detail>
         </dl>
-        {plant.description && (
+        {plant.description ? (
           <div>
-            <div className="text-xs text-zinc-500">Description</div>
-            <p className="text-sm">{plant.description}</p>
+            <Label>Description</Label>
+            <Body className="mt-1 text-sm">{plant.description}</Body>
           </div>
-        )}
-        {plant.notes && (
+        ) : null}
+        {plant.notes ? (
           <div>
-            <div className="text-xs text-zinc-500">Notes</div>
-            <p className="text-sm whitespace-pre-wrap">{plant.notes}</p>
+            <Label>Notes</Label>
+            <Body className="mt-1 text-sm whitespace-pre-wrap">{plant.notes}</Body>
           </div>
-        )}
-      </section>
+        ) : null}
+      </Card>
 
-      <section className="rounded-2xl border border-sage-100 bg-white dark:bg-zinc-900 p-5 shadow-soft">
-        <h2 className="flex items-center gap-2 font-semibold text-sage-700 mb-3">
-          <NotebookText size={18} strokeWidth={2} />
-          Historique d'arrosage
-        </h2>
+      {/* Watering history */}
+      <Card radius="organic-2" elevation="paper" padding="lg">
+        <div className="flex items-center gap-2 mb-4">
+          <Droplet size={18} className="text-terracotta-500" />
+          <H3>Historique d&apos;arrosage</H3>
+        </div>
         {plant.wateringLogs.length === 0 ? (
-          <p className="text-sm text-zinc-500">Aucun arrosage enregistré.</p>
+          <Body className="text-sm text-ink-400">Aucun arrosage enregistré pour le moment.</Body>
         ) : (
-          <ul className="text-sm space-y-1">
+          <ul className="space-y-1.5">
             {plant.wateringLogs.map((log) => (
-              <li key={log.id} className="flex items-center justify-between border-b border-sage-50 last:border-0 py-1.5">
+              <li
+                key={log.id}
+                className="flex items-center justify-between border-b border-paper-200 last:border-0 py-2 font-sans text-sm text-ink-800"
+              >
                 <span className="flex items-center gap-2">
-                  <Droplet size={14} className="text-violet-500" />
+                  <Droplet size={14} className="text-terracotta-400" />
                   {new Date(log.wateredAt).toLocaleDateString("fr-FR", { dateStyle: "medium" })}
                 </span>
-                {log.note && <span className="text-zinc-500 text-xs">{log.note}</span>}
+                {log.note ? <span className="text-ink-400 text-xs">{log.note}</span> : null}
               </li>
             ))}
           </ul>
         )}
-      </section>
+      </Card>
     </div>
   );
 }
@@ -141,11 +173,11 @@ export default async function PlantDetailPage({ params }: { params: { id: string
 function Detail({ icon, label, children }: { icon: React.ReactNode; label: string; children: React.ReactNode }) {
   return (
     <div>
-      <dt className="flex items-center gap-1.5 text-zinc-500 text-xs">
+      <dt className="flex items-center gap-1.5">
         {icon}
-        {label}
+        <Label>{label}</Label>
       </dt>
-      <dd className="mt-0.5">{children}</dd>
+      <dd className="mt-1 font-sans text-sm text-ink-800">{children}</dd>
     </div>
   );
 }

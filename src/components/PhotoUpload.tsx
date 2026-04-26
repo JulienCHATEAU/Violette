@@ -1,19 +1,31 @@
 "use client";
+
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Camera, Trash2 } from "lucide-react";
 import { compressImage } from "@/lib/image";
+import { Button } from "@/design-system/components/Button";
+import { ConfirmDialog } from "@/design-system/components/Dialog";
+import { Camera, Trash } from "@/design-system/icons";
 
 type Props = {
   plantId: string;
   hasPhoto: boolean;
 };
 
+/**
+ * PhotoUpload — adds, replaces or removes the plant photo.
+ *
+ * Business logic preserved from v2.x: client-side compression then a single POST
+ * to `/api/plants/{id}/photo`, or a DELETE for removal. The native `confirm()`
+ * has been replaced with a DS `ConfirmDialog` for a consistent, animated, focus-
+ * trapped confirmation flow.
+ */
 export function PhotoUpload({ plantId, hasPhoto }: Props) {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const [status, setStatus] = useState<"idle" | "working" | "error">("idle");
   const [error, setError] = useState<string | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const onFile = async (file: File) => {
     setError(null);
@@ -35,36 +47,41 @@ export function PhotoUpload({ plantId, hasPhoto }: Props) {
     }
   };
 
-  const onRemove = async () => {
-    if (!confirm("Supprimer la photo ?")) return;
+  const performRemove = async (): Promise<void> => {
+    setConfirmOpen(false);
     setStatus("working");
     const res = await fetch(`/api/plants/${plantId}/photo`, { method: "DELETE" });
     setStatus(res.ok ? "idle" : "error");
     if (res.ok) router.refresh();
   };
 
+  const working = status === "working";
+
   return (
     <div className="flex flex-wrap gap-2">
-      <button
+      <Button
         type="button"
+        variant="secondary"
+        size="sm"
         onClick={() => inputRef.current?.click()}
-        disabled={status === "working"}
-        className="inline-flex items-center gap-1.5 rounded-xl border border-violet-200 text-violet-700 dark:text-violet-300 hover:bg-violet-50 dark:hover:bg-violet-900/20 px-3 py-2 text-sm font-medium bg-white dark:bg-transparent disabled:opacity-60 transition"
+        disabled={working}
+        leadingIcon={<Camera size={16} />}
       >
-        <Camera size={16} strokeWidth={2} />
-        {status === "working" ? "Envoi…" : hasPhoto ? "Changer" : "Ajouter une photo"}
-      </button>
-      {hasPhoto && (
-        <button
+        {working ? "Envoi…" : hasPhoto ? "Changer" : "Ajouter une photo"}
+      </Button>
+      {hasPhoto ? (
+        <Button
           type="button"
-          onClick={onRemove}
-          disabled={status === "working"}
-          className="inline-flex items-center gap-1.5 rounded-xl border border-rose-200 text-rose-700 hover:bg-rose-50 px-3 py-2 text-sm font-medium disabled:opacity-60 transition"
+          variant="ghost"
+          size="sm"
+          onClick={() => setConfirmOpen(true)}
+          disabled={working}
+          leadingIcon={<Trash size={16} />}
+          className="!text-terracotta-600 hover:!bg-terracotta-50"
         >
-          <Trash2 size={16} strokeWidth={2} />
           Retirer
-        </button>
-      )}
+        </Button>
+      ) : null}
       <input
         ref={inputRef}
         type="file"
@@ -77,9 +94,21 @@ export function PhotoUpload({ plantId, hasPhoto }: Props) {
           e.target.value = "";
         }}
       />
-      {status === "error" && error && (
-        <p className="w-full text-sm text-rose-600" role="alert">{error}</p>
-      )}
+      {status === "error" && error ? (
+        <p className="w-full font-sans text-sm text-terracotta-600" role="alert">
+          {error}
+        </p>
+      ) : null}
+      <ConfirmDialog
+        open={confirmOpen}
+        onClose={() => setConfirmOpen(false)}
+        onConfirm={performRemove}
+        title="Supprimer la photo ?"
+        description="La photo actuelle sera retirée. Tu pourras toujours en ajouter une nouvelle."
+        confirmLabel="Supprimer"
+        cancelLabel="Annuler"
+        destructive
+      />
     </div>
   );
 }
