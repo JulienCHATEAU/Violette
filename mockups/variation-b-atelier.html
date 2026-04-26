@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Violette — Variation B — Atelier vert tendre</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          sage: { 50:'#F1F4EC', 100:'#DDE5CF', 200:'#BCC9A4', 400:'#8AA070', 500:'#6A8458', 600:'#506A40', 700:'#37502A' },
+          clay: { 50:'#FBEEE5', 100:'#F4D7C2', 400:'#E0A07E', 500:'#D4855E', 600:'#B36A45', 700:'#8A4A2C' },
+          linen: { 50:'#FBF8F2', 100:'#EFE7D8', 200:'#E0D3BB', 300:'#C9B79A' },
+          cocoa: { 400:'#7A6655', 600:'#54443A', 800:'#3D2F26', 900:'#2A1E18' }
+        },
+        fontFamily: {
+          serif: ['Lora', 'serif'],
+          sans: ['"DM Sans"', 'system-ui']
+        },
+        boxShadow: {
+          'soft':  '0 1px 2px rgba(61,47,38,.05), 0 12px 28px -14px rgba(61,47,38,.18)',
+          'lift':  '0 2px 4px rgba(61,47,38,.07), 0 24px 44px -18px rgba(61,47,38,.25)',
+          'inset-soft': 'inset 0 1px 2px rgba(61,47,38,.06)'
+        }
+      }
+    }
+  }
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<style>
+  body { font-family: 'DM Sans', system-ui, sans-serif; }
+  .font-serif { letter-spacing: -0.01em; }
+
+  .linen-bg {
+    background-color: #FBF8F2;
+    background-image:
+      radial-gradient(circle at 15% 20%, rgba(106,132,88,.08) 0, transparent 38%),
+      radial-gradient(circle at 85% 85%, rgba(212,133,94,.07) 0, transparent 42%);
+  }
+
+  /* device */
+  .device-frame {
+    width: 390px; height: 844px;
+    background: #2A1E18;
+    border-radius: 56px;
+    padding: 12px;
+    box-shadow: 0 30px 60px -20px rgba(61,47,38,.45), 0 0 0 1px rgba(61,47,38,.18);
+    position: relative;
+  }
+  .device-frame::before {
+    content: '';
+    position: absolute;
+    top: 18px; left: 50%;
+    transform: translateX(-50%);
+    width: 110px; height: 32px;
+    background: #2A1E18;
+    border-radius: 20px;
+    z-index: 30;
+  }
+  .device-screen {
+    width: 100%; height: 100%;
+    border-radius: 44px;
+    overflow: hidden;
+    background: #FBF8F2;
+    position: relative;
+  }
+  .carousel {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    height: 100%;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .carousel::-webkit-scrollbar { display: none; }
+  .screen {
+    flex: 0 0 100%;
+    scroll-snap-align: start;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: none;
+    position: relative;
+  }
+  .screen::-webkit-scrollbar { display: none; }
+
+  .status-bar {
+    height: 54px;
+    padding: 18px 28px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: #3D2F26;
+    position: relative;
+    z-index: 5;
+  }
+
+  /* blob shapes — more pronounced asymmetry */
+  .blob-1 { border-radius: 62% 38% 54% 46% / 48% 60% 40% 52%; }
+  .blob-2 { border-radius: 44% 56% 70% 30% / 52% 38% 62% 48%; }
+  .blob-3 { border-radius: 58% 42% 38% 62% / 64% 50% 50% 36%; }
+  .blob-soft { border-radius: 36px 48px 36px 48px / 44px 36px 44px 36px; }
+
+  /* organic round-leaf bubble */
+  .leaf-bubble {
+    background: #F1F4EC;
+    border: 1px solid #BCC9A4;
+    border-radius: 56% 44% 60% 40% / 48% 56% 44% 52%;
+    padding: 9px 14px 10px;
+    font-family: 'Lora', serif;
+    font-style: italic;
+    font-size: 13px;
+    color: #37502A;
+    line-height: 1.25;
+    box-shadow: 0 6px 14px -6px rgba(106,132,88,.4);
+    position: absolute;
+    animation: leaf-sway 6s ease-in-out infinite;
+  }
+  @keyframes leaf-sway {
+    0%,100% { transform: rotate(-2deg) translateY(0); }
+    50%     { transform: rotate(1deg) translateY(-4px); }
+  }
+
+  /* CTA Arroser */
+  .cta-water {
+    background: linear-gradient(155deg, #6A8458, #506A40);
+    color: #FBF8F2;
+    border-radius: 32px 28px 32px 28px / 28px 32px 28px 32px;
+    box-shadow: 0 6px 16px -4px rgba(106,132,88,.45), inset 0 1px 0 rgba(255,255,255,.18);
+    transition: transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .18s ease;
+  }
+  .cta-water:active {
+    transform: scale(.96);
+    box-shadow: 0 2px 6px -1px rgba(106,132,88,.45), inset 0 2px 6px rgba(61,47,38,.18);
+  }
+  .cta-clay {
+    background: linear-gradient(155deg, #D4855E, #B36A45);
+    color: #FBF8F2;
+    border-radius: 32px 28px 32px 28px / 28px 32px 28px 32px;
+    box-shadow: 0 6px 16px -4px rgba(212,133,94,.45);
+  }
+
+  .dot {
+    width: 8px; height: 8px; border-radius: 999px;
+    background: rgba(61,47,38,.2);
+    transition: all .25s ease;
+  }
+  .dot.active { width: 28px; background: #6A8458; }
+
+  @keyframes leaf-in {
+    from { opacity: 0; transform: translateY(10px) scale(.97); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  .leaf-in { animation: leaf-in .55s cubic-bezier(.34,1.56,.64,1) both; }
+  .leaf-in:nth-child(1){ animation-delay: .05s; }
+  .leaf-in:nth-child(2){ animation-delay: .12s; }
+  .leaf-in:nth-child(3){ animation-delay: .19s; }
+  .leaf-in:nth-child(4){ animation-delay: .26s; }
+  .leaf-in:nth-child(5){ animation-delay: .33s; }
+  .leaf-in:nth-child(6){ animation-delay: .40s; }
+
+  @keyframes drop-pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.18); opacity: .8; }
+  }
+  .drop-pulse { animation: drop-pulse 1.6s ease-in-out infinite; }
+
+  .nav-pill {
+    background: rgba(251,248,242,.92);
+    backdrop-filter: blur(12px);
+    border-radius: 36px 28px 36px 28px / 28px 36px 28px 36px;
+  }
+
+  .input-soft {
+    background: #FBF8F2;
+    border: 1.5px solid #E0D3BB;
+    border-radius: 22px 28px 22px 28px / 26px 22px 26px 22px;
+    transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+  }
+  .input-soft:focus {
+    outline: none;
+    border-color: #6A8458;
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(106,132,88,.14);
+  }
+
+  .blob-deco { position: absolute; pointer-events: none; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .leaf-bubble, .drop-pulse, .leaf-in { animation: none !important; }
+  }
+</style>
+</head>
+<body class="min-h-screen flex flex-col items-center py-10 px-4 linen-bg">
+
+  <!-- Header context -->
+  <div class="max-w-md text-center mb-8">
+    <p class="text-[11px] text-cocoa-600 uppercase tracking-[.25em] font-semibold mb-3">Violette · Maquette</p>
+    <h1 class="font-serif text-4xl text-cocoa-800 leading-tight mb-2">Variation B · Atelier vert tendre</h1>
+    <p class="text-cocoa-600 text-sm">Sage profond · lin · terracotta clair · <span class="font-serif italic">Lora</span> + DM Sans</p>
+    <div class="h-px my-5 mx-auto w-32 bg-gradient-to-r from-transparent via-cocoa-400 to-transparent opacity-50"></div>
+    <p class="text-xs text-cocoa-400">Glisse horizontalement dans le téléphone — 3 écrans</p>
+  </div>
+
+  <!-- DEVICE FRAME -->
+  <div class="device-frame">
+    <div class="device-screen">
+      <div class="carousel" id="carousel">
+
+        <!-- ============ SCREEN 1 — DASHBOARD ============ -->
+        <section class="screen linen-bg">
+          <div class="status-bar">
+            <span>9:41</span>
+            <span>·····</span>
+          </div>
+
+          <!-- Organic blob backgrounds -->
+          <svg class="blob-deco" style="top:60px; right:-40px; width:200px; height:200px; opacity:.15;" viewBox="0 0 200 200">
+            <path fill="#6A8458" d="M40,100 Q40,40 100,40 Q160,40 160,100 Q160,160 100,160 Q40,160 40,100 Z"/>
+          </svg>
+
+          <!-- Header -->
+          <div class="px-6 pt-3 pb-4 relative">
+            <p class="text-xs uppercase tracking-[.2em] text-cocoa-400 font-semibold">Dim. 26 avril</p>
+            <h2 class="font-serif text-3xl text-cocoa-800 mt-1.5 leading-tight">Coucou Julien <span class="text-clay-500">.</span></h2>
+            <p class="text-sm text-cocoa-600 mt-2">Ton atelier compte <span class="font-serif italic text-sage-600">6 plantes</span>. <br/>Deux ont besoin de toi.</p>
+          </div>
+
+          <!-- Section URGENT -->
+          <div class="px-6 pt-4">
+            <div class="flex items-baseline justify-between mb-3 px-1">
+              <h3 class="font-serif text-lg text-cocoa-800">Aujourd'hui</h3>
+              <span class="text-[11px] uppercase tracking-widest text-clay-600 font-semibold">2 plantes</span>
+            </div>
+
+            <!-- Urgent card -->
+            <div class="relative bg-white blob-soft shadow-soft p-3.5 mb-3 leaf-in">
+              <div class="flex gap-3.5 items-center">
+                <div class="w-20 h-20 blob-1 overflow-hidden bg-sage-100 shrink-0 relative">
+                  <img src="https://images.unsplash.com/photo-1614594975525-e45190c55d0b?w=200&q=80" alt="" class="w-full h-full object-cover">
+                  <div class="absolute -top-1 -left-1 w-7 h-7 bg-clay-500 rounded-full flex items-center justify-center shadow-soft drop-pulse">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#FBF8F2"><path d="M12 2C8 8 6 12 6 16a6 6 0 0012 0c0-4-2-8-6-14z"/></svg>
+                  </div>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <h4 class="font-serif text-xl text-cocoa-800 leading-tight">Mona</h4>
+                  <p class="text-xs italic text-cocoa-400 font-serif">Monstera deliciosa</p>
+                  <p class="text-[13px] text-clay-600 font-medium mt-1">Soif depuis 2 jours</p>
+                </div>
+              </div>
+              <!-- personification leaf bubble -->
+              <div class="leaf-bubble" style="top:-20px; right:18px;">Hello toi 👋</div>
+            </div>
+
+            <div class="bg-white blob-soft shadow-soft p-3.5 leaf-in">
+              <div class="flex gap-3.5 items-center">
+                <div class="w-20 h-20 blob-2 overflow-hidden bg-sage-100 shrink-0">
+                  <img src="https://images.unsplash.com/photo-1602923668104-8f9e03e77e62?w=200&q=80" alt="" class="w-full h-full object-cover">
+                </div>
+                <div class="flex-1 min-w-0">
+                  <h4 class="font-serif text-xl text-cocoa-800 leading-tight">Ondine</h4>
+                  <p class="text-xs italic text-cocoa-400 font-serif">Calathea orbifolia</p>
+                  <p class="text-[13px] text-clay-600 font-medium mt-1">À arroser ce soir</p>
+                </div>
+                <button class="cta-water w-12 h-12 flex items-center justify-center shrink-0">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="#FBF8F2"><path d="M12 2C8 8 6 12 6 16a6 6 0 0012 0c0-4-2-8-6-14z"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section À VENIR -->
+          <div class="px-6 pt-7">
+            <div class="flex items-baseline justify-between mb-3 px-1">
+              <h3 class="font-serif text-lg text-cocoa-800">Cette semaine</h3>
+              <span class="text-[11px] uppercase tracking-widest text-sage-600 font-semibold">tranquilles</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div class="bg-white blob-soft shadow-soft p-2.5 leaf-in">
+                <div class="aspect-[4/5] blob-3 overflow-hidden bg-sage-100 mb-2.5">
+                  <img src="https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?w=300&q=80" alt="" class="w-full h-full object-cover">
+                </div>
+                <h4 class="font-serif text-base text-cocoa-800 leading-tight">Sergio</h4>
+                <p class="text-[11px] italic font-serif text-cocoa-400 truncate">Echinocactus</p>
+                <p class="text-[11px] text-sage-600 mt-1 font-medium">dans 9 j</p>
+              </div>
+
+              <div class="bg-white blob-soft shadow-soft p-2.5 leaf-in relative">
+                <div class="leaf-bubble" style="top:-14px; left:8px; font-size:11px; padding:6px 10px;">Ça va ? 🌱</div>
+                <div class="aspect-[4/5] blob-1 overflow-hidden bg-sage-100 mb-2.5">
+                  <img src="https://images.unsplash.com/photo-1603436326446-74e2d40fc7d3?w=300&q=80" alt="" class="w-full h-full object-cover">
+                </div>
+                <h4 class="font-serif text-base text-cocoa-800 leading-tight">Pilou</h4>
+                <p class="text-[11px] italic font-serif text-cocoa-400 truncate">Pilea peperomioides</p>
+                <p class="text-[11px] text-sage-600 mt-1 font-medium">demain</p>
+              </div>
+
+              <div class="bg-white blob-soft shadow-soft p-2.5 leaf-in">
+                <div class="aspect-[4/5] blob-2 overflow-hidden bg-sage-100 mb-2.5">
+                  <img src="https://images.unsplash.com/photo-1572688484438-313a6e50c333?w=300&q=80" alt="" class="w-full h-full object-cover">
+                </div>
+                <h4 class="font-serif text-base text-cocoa-800 leading-tight">Lance</h4>
+                <p class="text-[11px] italic font-serif text-cocoa-400 truncate">Sansevieria</p>
+                <p class="text-[11px] text-sage-600 mt-1 font-medium">dans 4 j</p>
+              </div>
+
+              <div class="bg-white blob-soft shadow-soft p-2.5 leaf-in">
+                <div class="aspect-[4/5] blob-3 overflow-hidden bg-sage-100 mb-2.5">
+                  <img src="https://images.unsplash.com/photo-1597055181300-e7a9b95181f7?w=300&q=80" alt="" class="w-full h-full object-cover">
+                </div>
+                <h4 class="font-serif text-base text-cocoa-800 leading-tight">Vert</h4>
+                <p class="text-[11px] italic font-serif text-cocoa-400 truncate">Pothos doré</p>
+                <p class="text-[11px] text-sage-600 mt-1 font-medium">dans 6 j</p>
+              </div>
+            </div>
+            <div class="h-32"></div>
+          </div>
+
+          <!-- Bottom Nav -->
+          <div class="absolute bottom-0 left-0 right-0 px-5 pb-6 pt-2">
+            <div class="nav-pill flex justify-around items-center py-3 px-4 shadow-soft border border-linen-200">
+              <button class="flex flex-col items-center gap-0.5 text-sage-600">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12L12 4l9 8"/><path d="M5 11v9h14v-9"/></svg>
+                <span class="text-[10px] font-semibold tracking-wide">Accueil</span>
+              </button>
+              <button class="w-12 h-12 -mt-7 cta-water flex items-center justify-center">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FBF8F2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+              <button class="flex flex-col items-center gap-0.5 text-cocoa-400">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M12 2C9 8 6 11 6 15a6 6 0 0012 0c0-4-3-7-6-13z"/></svg>
+                <span class="text-[10px] font-medium tracking-wide">Mes plantes</span>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ SCREEN 2 — DETAIL PLANT ============ -->
+        <section class="screen linen-bg">
+          <div class="status-bar">
+            <span>9:41</span>
+            <span>·····</span>
+          </div>
+
+          <!-- Hero photo blob -->
+          <div class="relative px-5 pt-1">
+            <div class="relative blob-1 overflow-hidden h-72 shadow-lift">
+              <img src="https://images.unsplash.com/photo-1614594975525-e45190c55d0b?w=600&q=80" alt="Mona" class="w-full h-full object-cover">
+              <div class="absolute inset-0 bg-gradient-to-t from-cocoa-900/35 via-transparent to-transparent"></div>
+              <button class="absolute top-4 left-4 w-10 h-10 rounded-full bg-linen-50/95 backdrop-blur flex items-center justify-center shadow-soft">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3D2F26" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+              </button>
+              <button class="absolute top-4 right-4 w-10 h-10 rounded-full bg-linen-50/95 backdrop-blur flex items-center justify-center shadow-soft">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3D2F26" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4v7m16-7h-7m-9 9v7h7m9-7v7h-7"/></svg>
+              </button>
+              <div class="leaf-bubble" style="bottom:18px; left:24px;">Tu m'as manqué…</div>
+            </div>
+          </div>
+
+          <!-- Title -->
+          <div class="px-7 pt-6">
+            <p class="text-[11px] uppercase tracking-[.25em] text-clay-600 font-semibold">Tropicale · ombre claire</p>
+            <h2 class="font-serif text-4xl text-cocoa-800 leading-none mt-1">Mona</h2>
+            <p class="font-serif italic text-cocoa-400 text-base mt-1.5">Monstera deliciosa</p>
+          </div>
+
+          <!-- WATER CTA — peak moment -->
+          <div class="px-6 pt-6">
+            <div class="bg-white blob-soft shadow-soft p-4 relative overflow-hidden">
+              <svg class="blob-deco" style="bottom:-30px; right:-20px; width:160px; height:160px; opacity:.18;" viewBox="0 0 200 200">
+                <path fill="#6A8458" d="M40,100 Q40,40 100,40 Q160,40 160,100 Q160,160 100,160 Q40,160 40,100 Z"/>
+              </svg>
+              <p class="text-xs uppercase tracking-[.2em] text-clay-600 font-semibold">Prochain arrosage</p>
+              <p class="font-serif text-2xl text-cocoa-800 mt-0.5">depuis 2 jours</p>
+              <p class="text-sm text-cocoa-600 mt-0.5">Elle commence à se faire du souci.</p>
+              <button class="cta-water w-full mt-4 py-4 font-semibold text-base flex items-center justify-center gap-2.5">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="#FBF8F2"><path d="M12 2C8 8 6 12 6 16a6 6 0 0012 0c0-4-2-8-6-14z"/></svg>
+                <span>Je viens de l'arroser</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Caractéristiques -->
+          <div class="px-6 pt-7">
+            <h3 class="font-serif text-lg text-cocoa-800 mb-3 px-1">Sa fiche</h3>
+            <div class="grid grid-cols-2 gap-3">
+              <div class="bg-linen-50 blob-soft border border-linen-200 p-3.5">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#D4855E" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 3v1M12 20v1M3 12h1M20 12h1M5.6 5.6l.7.7M17.7 17.7l.7.7M5.6 18.4l.7-.7M17.7 6.3l.7-.7"/></svg>
+                <p class="text-[11px] uppercase tracking-wider text-cocoa-400 mt-2 font-semibold">Lumière</p>
+                <p class="font-serif text-base text-cocoa-800 mt-0.5">Indirecte vive</p>
+              </div>
+              <div class="bg-linen-50 blob-soft border border-linen-200 p-3.5">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6A8458" stroke-width="1.6" stroke-linecap="round"><path d="M12 3C8 8 5 11 5 15a7 7 0 0014 0c0-4-3-7-7-12z"/></svg>
+                <p class="text-[11px] uppercase tracking-wider text-cocoa-400 mt-2 font-semibold">Humidité</p>
+                <p class="font-serif text-base text-cocoa-800 mt-0.5">Élevée</p>
+              </div>
+              <div class="bg-linen-50 blob-soft border border-linen-200 p-3.5">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#D4855E" stroke-width="1.6" stroke-linecap="round"><path d="M14 4v9a4 4 0 11-4 0V4a2 2 0 014 0z"/><circle cx="12" cy="17" r="2"/></svg>
+                <p class="text-[11px] uppercase tracking-wider text-cocoa-400 mt-2 font-semibold">Température</p>
+                <p class="font-serif text-base text-cocoa-800 mt-0.5">18-25°C</p>
+              </div>
+              <div class="bg-linen-50 blob-soft border border-linen-200 p-3.5">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6A8458" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2"/></svg>
+                <p class="text-[11px] uppercase tracking-wider text-cocoa-400 mt-2 font-semibold">Fréquence</p>
+                <p class="font-serif text-base text-cocoa-800 mt-0.5">tous les 7 j</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Historique -->
+          <div class="px-6 pt-7 pb-32">
+            <h3 class="font-serif text-lg text-cocoa-800 mb-3 px-1">Histoire ensemble</h3>
+            <div class="bg-white blob-soft shadow-soft p-4">
+              <div class="relative pl-7 pb-4 border-l-2 border-dashed border-sage-200 ml-3">
+                <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-clay-500 border-2 border-white shadow-soft"></div>
+                <p class="font-serif text-sm text-cocoa-800">Arrosée</p>
+                <p class="text-xs text-cocoa-400 mt-0.5">il y a 9 jours · 12 cl</p>
+              </div>
+              <div class="relative pl-7 pb-4 border-l-2 border-dashed border-sage-200 ml-3">
+                <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-sage-500 border-2 border-white shadow-soft"></div>
+                <p class="font-serif text-sm text-cocoa-800">Rempotée</p>
+                <p class="text-xs text-cocoa-400 mt-0.5">il y a 1 mois</p>
+              </div>
+              <div class="relative pl-7 ml-3">
+                <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-linen-300 border-2 border-white shadow-soft"></div>
+                <p class="font-serif text-sm text-cocoa-800 italic">Adoptée</p>
+                <p class="text-xs text-cocoa-400 mt-0.5">il y a 4 mois</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ SCREEN 3 — ADD PLANT ============ -->
+        <section class="screen linen-bg">
+          <div class="status-bar">
+            <span>9:41</span>
+            <span>·····</span>
+          </div>
+
+          <!-- Header -->
+          <div class="px-6 pt-1 pb-4 flex items-center justify-between">
+            <button class="w-10 h-10 rounded-full bg-white border border-linen-200 flex items-center justify-center shadow-soft">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3D2F26" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            </button>
+            <p class="text-[11px] uppercase tracking-[.25em] text-cocoa-400 font-semibold">Étape 1 · 2</p>
+            <div class="w-10"></div>
+          </div>
+
+          <!-- Title -->
+          <div class="px-7 pb-5 relative">
+            <svg class="blob-deco" style="top:-10px; right:0; width:90px; height:90px; opacity:.25;" viewBox="0 0 200 200">
+              <path fill="#D4855E" d="M40,100 Q40,40 100,40 Q160,40 160,100 Q160,160 100,160 Q40,160 40,100 Z"/>
+            </svg>
+            <p class="text-[11px] uppercase tracking-[.25em] text-clay-600 font-semibold">Bienvenue</p>
+            <h2 class="font-serif text-3xl text-cocoa-800 leading-tight mt-1">Une nouvelle<br/>colocataire ?</h2>
+            <p class="text-sm text-cocoa-600 mt-2">On commence par lui faire un portrait.</p>
+          </div>
+
+          <!-- Photo upload blob -->
+          <div class="px-6 mb-5">
+            <div class="bg-white blob-soft shadow-soft p-4">
+              <div class="aspect-[4/3] blob-2 border-2 border-dashed border-linen-300 bg-linen-50 flex flex-col items-center justify-center gap-2.5 relative overflow-hidden">
+                <div class="w-14 h-14 rounded-full bg-clay-100 flex items-center justify-center">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#D4855E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/>
+                  </svg>
+                </div>
+                <p class="font-serif text-base text-cocoa-800">Prends-la en photo</p>
+                <p class="text-xs text-cocoa-400">ou choisis depuis la galerie</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Form -->
+          <div class="px-6 space-y-4 pb-32">
+            <div>
+              <label class="block text-[11px] uppercase tracking-wider text-cocoa-600 font-semibold mb-1.5 px-1">Petit nom</label>
+              <input type="text" placeholder="Mona, Pilou, Sergio…" class="input-soft w-full px-4 py-3.5 font-serif text-lg text-cocoa-800 placeholder:text-cocoa-400 placeholder:italic placeholder:text-base">
+            </div>
+
+            <div>
+              <label class="block text-[11px] uppercase tracking-wider text-cocoa-600 font-semibold mb-1.5 px-1">Espèce</label>
+              <input type="text" placeholder="Monstera deliciosa" class="input-soft w-full px-4 py-3.5 italic font-serif text-base text-cocoa-800 placeholder:text-cocoa-400">
+            </div>
+
+            <div>
+              <label class="block text-[11px] uppercase tracking-wider text-cocoa-600 font-semibold mb-1.5 px-1">Arrosage tous les</label>
+              <div class="input-soft flex items-center px-4 py-2">
+                <button class="w-9 h-9 rounded-full bg-linen-100 border border-linen-200 flex items-center justify-center text-cocoa-800 font-bold">−</button>
+                <div class="flex-1 text-center">
+                  <span class="font-serif text-3xl text-cocoa-800">7</span>
+                  <span class="text-sm text-cocoa-600 ml-1.5">jours</span>
+                </div>
+                <button class="w-9 h-9 rounded-full bg-sage-500 flex items-center justify-center text-linen-50 font-bold shadow-soft">+</button>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-[11px] uppercase tracking-wider text-cocoa-600 font-semibold mb-1.5 px-1">Lumière qu'elle reçoit</label>
+              <div class="grid grid-cols-3 gap-2">
+                <button class="bg-white blob-soft border border-linen-200 px-2 py-3 text-center shadow-soft">
+                  <p class="text-xl">🌑</p>
+                  <p class="text-[11px] text-cocoa-600 font-medium mt-0.5">Faible</p>
+                </button>
+                <button class="cta-water blob-soft px-2 py-3 text-center">
+                  <p class="text-xl">🌗</p>
+                  <p class="text-[11px] text-linen-50 font-semibold mt-0.5">Indirecte</p>
+                </button>
+                <button class="bg-white blob-soft border border-linen-200 px-2 py-3 text-center shadow-soft">
+                  <p class="text-xl">☀️</p>
+                  <p class="text-[11px] text-cocoa-600 font-medium mt-0.5">Vive</p>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sticky CTA -->
+          <div class="absolute bottom-0 left-0 right-0 px-6 pb-6 pt-3" style="background: linear-gradient(to top, #FBF8F2 60%, transparent);">
+            <button class="cta-water w-full py-4 font-semibold text-base flex items-center justify-center gap-2">
+              <span>Continuer</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FBF8F2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination dots -->
+  <div class="flex gap-2 mt-7" id="dots">
+    <button class="dot active" data-i="0" aria-label="Dashboard"></button>
+    <button class="dot" data-i="1" aria-label="Détail"></button>
+    <button class="dot" data-i="2" aria-label="Ajout"></button>
+  </div>
+
+  <!-- Caption -->
+  <div class="max-w-md mt-7 text-center text-xs text-cocoa-400 font-medium tracking-wide">
+    Dashboard · Détail Mona · Ajout — <span class="font-serif italic text-sage-600">swipe horizontal</span>
+  </div>
+
+<script>
+  const carousel = document.getElementById('carousel');
+  const dots = document.querySelectorAll('#dots .dot');
+  dots.forEach(d => d.addEventListener('click', () => {
+    carousel.scrollTo({ left: carousel.clientWidth * +d.dataset.i, behavior: 'smooth' });
+  }));
+  carousel.addEventListener('scroll', () => {
+    const i = Math.round(carousel.scrollLeft / carousel.clientWidth);
+    dots.forEach((d, idx) => d.classList.toggle('active', idx === i));
+  });
+</script>
+</body>
+</html>

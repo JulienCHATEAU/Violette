@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Violette — Variation A — Herbier vintage moderne</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          terracotta: { 50:'#FBF1EC', 100:'#F1D8CC', 200:'#E5BBA8', 400:'#D17B5C', 500:'#C4583E', 600:'#A8402A', 700:'#7A2A1A' },
+          moss: { 50:'#EFF1EA', 100:'#DBE0CC', 200:'#B9C3A0', 400:'#7D8E6A', 500:'#5C6F4F', 600:'#445436', 700:'#2D3A22' },
+          paper: { 50:'#FAF6EC', 100:'#F4ECDD', 200:'#E9DEC4', 300:'#D9C9A4' },
+          ink: { 400:'#8C7A6E', 600:'#5A4A40', 800:'#2B1F1A', 900:'#1A1310' }
+        },
+        fontFamily: {
+          serif: ['Fraunces', 'serif'],
+          sans: ['"Plus Jakarta Sans"', 'system-ui']
+        },
+        boxShadow: {
+          'paper': '0 1px 2px rgba(43,31,26,.06), 0 8px 24px -12px rgba(43,31,26,.18)',
+          'lift':  '0 2px 4px rgba(43,31,26,.08), 0 18px 38px -16px rgba(43,31,26,.25)',
+          'press': 'inset 0 2px 4px rgba(43,31,26,.10)'
+        }
+      }
+    }
+  }
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
+  .font-serif { font-feature-settings: 'ss01', 'ss02'; letter-spacing: -0.01em; }
+
+  /* paper grain texture */
+  .paper-texture {
+    background-image:
+      radial-gradient(rgba(90,74,64,.04) 1px, transparent 1px),
+      radial-gradient(rgba(90,74,64,.03) 1px, transparent 1px);
+    background-size: 3px 3px, 7px 7px;
+    background-position: 0 0, 1px 2px;
+  }
+  .screen-paper {
+    background-color: #FAF6EC;
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(196,88,62,.05) 0, transparent 40%),
+      radial-gradient(circle at 80% 90%, rgba(92,111,79,.06) 0, transparent 45%),
+      radial-gradient(rgba(90,74,64,.025) 1px, transparent 1px);
+    background-size: auto, auto, 3px 3px;
+  }
+
+  /* device */
+  .device-frame {
+    width: 390px;
+    height: 844px;
+    background: #1a1310;
+    border-radius: 56px;
+    padding: 12px;
+    box-shadow: 0 30px 60px -20px rgba(43,31,26,.45), 0 0 0 1px rgba(43,31,26,.2);
+    position: relative;
+  }
+  .device-frame::before {
+    content: '';
+    position: absolute;
+    top: 18px; left: 50%;
+    transform: translateX(-50%);
+    width: 110px; height: 32px;
+    background: #1a1310;
+    border-radius: 20px;
+    z-index: 30;
+  }
+  .device-screen {
+    width: 100%; height: 100%;
+    border-radius: 44px;
+    overflow: hidden;
+    background: #FAF6EC;
+    position: relative;
+  }
+  .carousel {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    height: 100%;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .carousel::-webkit-scrollbar { display: none; }
+  .screen {
+    flex: 0 0 100%;
+    scroll-snap-align: start;
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: none;
+    position: relative;
+  }
+  .screen::-webkit-scrollbar { display: none; }
+
+  /* status bar */
+  .status-bar {
+    height: 54px;
+    padding: 18px 28px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: #2B1F1A;
+    position: relative;
+    z-index: 5;
+  }
+
+  /* organic card radii */
+  .card-organic-1 { border-radius: 28px 36px 28px 40px; }
+  .card-organic-2 { border-radius: 36px 28px 40px 28px; }
+  .card-organic-3 { border-radius: 32px 32px 40px 28px; }
+
+  /* bubble: post-it style for personification */
+  .bubble {
+    background: #FBF1EC;
+    border: 1px solid #E5BBA8;
+    border-radius: 14px 18px 14px 4px;
+    padding: 8px 12px;
+    font-family: 'Fraunces', serif;
+    font-size: 13px;
+    color: #7A2A1A;
+    line-height: 1.25;
+    box-shadow: 0 4px 10px -4px rgba(196,88,62,.35);
+    position: absolute;
+    transform: rotate(-3deg);
+    animation: bubble-float 5s ease-in-out infinite;
+  }
+  .bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -6px; left: 18px;
+    width: 12px; height: 12px;
+    background: #FBF1EC;
+    border-right: 1px solid #E5BBA8;
+    border-bottom: 1px solid #E5BBA8;
+    transform: rotate(45deg);
+  }
+  @keyframes bubble-float {
+    0%,100% { transform: rotate(-3deg) translateY(0); }
+    50%     { transform: rotate(-2deg) translateY(-3px); }
+  }
+
+  /* botanical filets — subtle line ornaments */
+  .filet-h {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(90,74,64,.25), transparent);
+  }
+
+  /* CTA Arroser — peak moment */
+  .cta-water {
+    background: linear-gradient(180deg, #C4583E, #A8402A);
+    color: #FAF6EC;
+    border-radius: 22px 26px 22px 26px;
+    box-shadow: 0 4px 12px -2px rgba(196,88,62,.45), inset 0 1px 0 rgba(255,255,255,.18);
+    transition: transform .18s cubic-bezier(.34,1.56,.64,1), box-shadow .18s ease;
+  }
+  .cta-water:active {
+    transform: scale(.96);
+    box-shadow: 0 2px 6px -1px rgba(196,88,62,.45), inset 0 2px 6px rgba(43,31,26,.18);
+  }
+
+  /* dots pagination */
+  .dot {
+    width: 8px; height: 8px; border-radius: 999px;
+    background: rgba(43,31,26,.2);
+    transition: all .25s ease;
+  }
+  .dot.active { width: 28px; background: #C4583E; }
+
+  /* gentle entrance for plant cards */
+  @keyframes leaf-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .leaf-in { animation: leaf-in .55s ease-out both; }
+  .leaf-in:nth-child(1){ animation-delay: .05s; }
+  .leaf-in:nth-child(2){ animation-delay: .12s; }
+  .leaf-in:nth-child(3){ animation-delay: .19s; }
+  .leaf-in:nth-child(4){ animation-delay: .26s; }
+  .leaf-in:nth-child(5){ animation-delay: .33s; }
+  .leaf-in:nth-child(6){ animation-delay: .40s; }
+
+  /* watering droplet pulse on urgent badge */
+  @keyframes drop-pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.15); opacity: .85; }
+  }
+  .drop-pulse { animation: drop-pulse 1.6s ease-in-out infinite; }
+
+  /* bottom nav */
+  .nav-pill { background: rgba(250,246,236,.92); backdrop-filter: blur(10px); }
+
+  /* form input organic */
+  .input-organic {
+    background: #FAF6EC;
+    border: 1px solid #D9C9A4;
+    border-radius: 18px 22px 18px 22px;
+    transition: border-color .2s ease, box-shadow .2s ease;
+  }
+  .input-organic:focus {
+    outline: none;
+    border-color: #C4583E;
+    box-shadow: 0 0 0 4px rgba(196,88,62,.12);
+  }
+
+  /* leaf SVG decoration */
+  .leaf-deco { position: absolute; pointer-events: none; opacity: .35; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bubble, .drop-pulse, .leaf-in { animation: none !important; }
+  }
+</style>
+</head>
+<body class="min-h-screen paper-texture flex flex-col items-center py-10 px-4" style="background:#F4ECDD;">
+
+  <!-- Header context -->
+  <div class="max-w-md text-center mb-8">
+    <p class="text-[11px] text-ink-600 uppercase tracking-[.25em] font-semibold mb-3">Violette · Maquette</p>
+    <h1 class="font-serif text-4xl text-ink-800 leading-tight mb-2">Variation A · Herbier moderne</h1>
+    <p class="text-ink-600 text-sm">Terracotta · mousse · papier · <span class="font-serif italic">Fraunces</span> + Jakarta</p>
+    <div class="filet-h my-5 mx-auto w-32"></div>
+    <p class="text-xs text-ink-400">Glisse horizontalement dans le téléphone — 3 écrans</p>
+  </div>
+
+  <!-- DEVICE FRAME -->
+  <div class="device-frame">
+    <div class="device-screen">
+      <div class="carousel" id="carousel">
+
+        <!-- ============ SCREEN 1 — DASHBOARD ============ -->
+        <section class="screen screen-paper">
+          <div class="status-bar">
+            <span>9:41</span>
+            <span>·····</span>
+          </div>
+
+          <!-- Header -->
+          <div class="px-6 pt-2 pb-4 relative">
+            <svg class="leaf-deco" style="top:-8px; right:-12px; width:120px; height:120px;" viewBox="0 0 120 120" fill="none">
+              <path d="M60 10 Q90 30 95 60 Q90 90 60 110 Q30 90 25 60 Q30 30 60 10 Z" stroke="#5C6F4F" stroke-width=".8" fill="none"/>
+              <path d="M60 10 L60 110" stroke="#5C6F4F" stroke-width=".6"/>
+              <path d="M60 30 L40 40 M60 45 L38 55 M60 60 L36 70 M60 75 L40 82 M60 30 L80 40 M60 45 L82 55 M60 60 L84 70 M60 75 L80 82" stroke="#5C6F4F" stroke-width=".5"/>
+            </svg>
+            <p class="text-xs uppercase tracking-[.2em] text-ink-400 font-semibold">Dimanche · 26 avril</p>
+            <h2 class="font-serif text-3xl text-ink-800 mt-1">Bonjour Julien</h2>
+            <p class="text-sm text-ink-600 mt-1.5"><span class="font-serif italic text-terracotta-500">2 plantes</span> ont soif aujourd'hui.</p>
+          </div>
+
+          <div class="filet-h mx-6"></div>
+
+          <!-- Section URGENT -->
+          <div class="px-6 pt-5">
+            <div class="flex items-baseline justify-between mb-3">
+              <h3 class="font-serif text-lg text-ink-800">À arroser</h3>
+              <span class="text-[11px] uppercase tracking-widest text-terracotta-600 font-semibold">aujourd'hui</span>
+            </div>
+
+            <!-- Urgent card large -->
+            <div class="relative bg-white card-organic-1 shadow-paper p-3 mb-3 leaf-in">
+              <div class="flex gap-3 items-center">
+                <div class="w-20 h-20 rounded-[18px_24px_18px_24px] overflow-hidden bg-moss-100 shrink-0 relative">
+                  <img src="https://images.unsplash.com/photo-1614594975525-e45190c55d0b?w=200&q=80" alt="" class="w-full h-full object-cover">
+                  <div class="absolute -top-1 -left-1 w-7 h-7 bg-terracotta-500 rounded-full flex items-center justify-center shadow-paper drop-pulse">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="#FAF6EC"><path d="M12 2C8 8 6 12 6 16a6 6 0 0012 0c0-4-2-8-6-14z"/></svg>
+                  </div>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <h4 class="font-serif text-xl text-ink-800 leading-tight">Mona</h4>
+                  <p class="text-xs italic text-ink-400">Monstera deliciosa</p>
+                  <p class="text-[13px] text-terracotta-600 font-medium mt-1">Soif depuis 2 jours</p>
+                </div>
+              </div>
+              <!-- personification bubble -->
+              <div class="bubble" style="top:-22px; right:14px;">Hé, j'ai vraiment soif 🥺</div>
+            </div>
+
+            <div class="bg-white card-organic-2 shadow-paper p-3 leaf-in">
+              <div class="flex gap-3 items-center">
+                <div class="w-20 h-20 rounded-[24px_18px_24px_18px] overflow-hidden bg-moss-100 shrink-0">
+                  <img src="https://images.unsplash.com/photo-1602923668104-8f9e03e77e62?w=200&q=80" alt="" class="w-full h-full object-cover">
+                </div>
+                <div class="flex-1 min-w-0">
+                  <h4 class="font-serif text-xl text-ink-800 leading-tight">Ondine</h4>
+                  <p class="text-xs italic text-ink-400">Calathea orbifolia</p>
+                  <p class="text-[13px] text-terracotta-600 font-medium mt-1">À arroser ce soir</p>
+                </div>
+                <button class="cta-water w-12 h-12 rounded-[14px_18px_14px_18px] flex items-center justify-center shrink-0">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="#FAF6EC"><path d="M12 2C8 8 6 12 6 16a6 6 0 0012 0c0-4-2-8-6-14z"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section À VENIR -->
+          <div class="px-6 pt-7">
+            <div class="flex items-baseline justify-between mb-3">
+              <h3 class="font-serif text-lg text-ink-800">Cette semaine</h3>
+              <span class="text-[11px] uppercase tracking-widest text-moss-600 font-semibold">à venir</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div class="bg-white card-organic-3 shadow-paper p-2.5 leaf-in relative">
+                <div class="aspect-[4/5] rounded-[18px_22px_18px_22px] overflow-hidden bg-moss-100 mb-2">
+                  <img src="https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?w=300&q=80" alt="" class="w-full h-full object-cover">
+                </div>
+                <h4 class="font-serif text-base text-ink-800 leading-tight">Sergio</h4>
+                <p class="text-[11px] italic text-ink-400 truncate">Echinocactus</p>
+                <p class="text-[11px] text-moss-600 mt-1">dans 9 j</p>
+              </div>
+
+              <div class="bg-white card-organic-1 shadow-paper p-2.5 leaf-in relative">
+                <div class="bubble" style="top:-18px; left:10px; font-size:11px;">Salut 🌿</div>
+                <div class="aspect-[4/5] rounded-[22px_18px_22px_18px] overflow-hidden bg-moss-100 mb-2">
+                  <img src="https://images.unsplash.com/photo-1603436326446-74e2d40fc7d3?w=300&q=80" alt="" class="w-full h-full object-cover">
+                </div>
+                <h4 class="font-serif text-base text-ink-800 leading-tight">Pilou</h4>
+                <p class="text-[11px] italic text-ink-400 truncate">Pilea peperomioides</p>
+                <p class="text-[11px] text-moss-600 mt-1">demain</p>
+              </div>
+
+              <div class="bg-white card-organic-2 shadow-paper p-2.5 leaf-in">
+                <div class="aspect-[4/5] rounded-[18px_22px_18px_22px] overflow-hidden bg-moss-100 mb-2">
+                  <img src="https://images.unsplash.com/photo-1572688484438-313a6e50c333?w=300&q=80" alt="" class="w-full h-full object-cover">
+                </div>
+                <h4 class="font-serif text-base text-ink-800 leading-tight">Lance</h4>
+                <p class="text-[11px] italic text-ink-400 truncate">Sansevieria</p>
+                <p class="text-[11px] text-moss-600 mt-1">dans 4 j</p>
+              </div>
+
+              <div class="bg-white card-organic-3 shadow-paper p-2.5 leaf-in">
+                <div class="aspect-[4/5] rounded-[22px_18px_22px_18px] overflow-hidden bg-moss-100 mb-2">
+                  <img src="https://images.unsplash.com/photo-1597055181300-e7a9b95181f7?w=300&q=80" alt="" class="w-full h-full object-cover">
+                </div>
+                <h4 class="font-serif text-base text-ink-800 leading-tight">Vert</h4>
+                <p class="text-[11px] italic text-ink-400 truncate">Pothos doré</p>
+                <p class="text-[11px] text-moss-600 mt-1">dans 6 j</p>
+              </div>
+            </div>
+            <div class="h-28"></div>
+          </div>
+
+          <!-- Bottom Nav -->
+          <div class="absolute bottom-0 left-0 right-0 px-5 pb-6 pt-2">
+            <div class="nav-pill flex justify-around items-center py-3 px-4 rounded-[26px_30px_26px_30px] shadow-paper border border-paper-200">
+              <button class="flex flex-col items-center gap-0.5 text-terracotta-500">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12L12 4l9 8"/><path d="M5 11v9h14v-9"/></svg>
+                <span class="text-[10px] font-semibold tracking-wide">Accueil</span>
+              </button>
+              <button class="w-12 h-12 -mt-7 cta-water rounded-[18px_22px_18px_22px] flex items-center justify-center">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FAF6EC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+              </button>
+              <button class="flex flex-col items-center gap-0.5 text-ink-400">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M12 2C9 8 6 11 6 15a6 6 0 0012 0c0-4-3-7-6-13z"/></svg>
+                <span class="text-[10px] font-medium tracking-wide">Mes plantes</span>
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ SCREEN 2 — DETAIL PLANT ============ -->
+        <section class="screen screen-paper">
+          <div class="status-bar">
+            <span>9:41</span>
+            <span>·····</span>
+          </div>
+
+          <!-- Hero photo -->
+          <div class="relative px-5 pt-1">
+            <div class="relative rounded-[36px_44px_36px_44px] overflow-hidden h-72 shadow-lift">
+              <img src="https://images.unsplash.com/photo-1614594975525-e45190c55d0b?w=600&q=80" alt="Mona" class="w-full h-full object-cover">
+              <div class="absolute inset-0 bg-gradient-to-t from-ink-900/40 via-transparent to-transparent"></div>
+              <button class="absolute top-4 left-4 w-10 h-10 rounded-full bg-paper-50/95 backdrop-blur flex items-center justify-center shadow-paper">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2B1F1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+              </button>
+              <button class="absolute top-4 right-4 w-10 h-10 rounded-full bg-paper-50/95 backdrop-blur flex items-center justify-center shadow-paper">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#2B1F1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4v7m16-7h-7m-9 9v7h7m9-7v7h-7"/></svg>
+              </button>
+              <!-- bubble personification -->
+              <div class="bubble" style="bottom:18px; left:24px;">Tu m'as manqué…</div>
+            </div>
+          </div>
+
+          <!-- Title -->
+          <div class="px-7 pt-6">
+            <p class="text-[11px] uppercase tracking-[.25em] text-terracotta-600 font-semibold">Tropical · à l'ombre</p>
+            <h2 class="font-serif text-4xl text-ink-800 leading-none mt-1">Mona</h2>
+            <p class="font-serif italic text-ink-400 text-base mt-1.5">Monstera deliciosa</p>
+          </div>
+
+          <div class="filet-h mx-7 my-5"></div>
+
+          <!-- WATER CTA — peak moment -->
+          <div class="px-6">
+            <div class="bg-white card-organic-1 shadow-paper p-4 relative overflow-hidden">
+              <svg class="leaf-deco" style="bottom:-30px; right:-16px; width:140px; height:140px; opacity:.18;" viewBox="0 0 120 120" fill="none">
+                <path d="M60 10 Q90 30 95 60 Q90 90 60 110 Q30 90 25 60 Q30 30 60 10 Z" stroke="#5C6F4F" stroke-width="1" fill="none"/>
+                <path d="M60 10 L60 110" stroke="#5C6F4F" stroke-width=".8"/>
+              </svg>
+              <p class="text-xs uppercase tracking-[.2em] text-terracotta-600 font-semibold">Prochain arrosage</p>
+              <p class="font-serif text-2xl text-ink-800 mt-0.5">depuis 2 jours</p>
+              <p class="text-sm text-ink-600 mt-0.5">Elle commence à se faire du souci.</p>
+              <button class="cta-water w-full mt-4 py-4 font-semibold text-base flex items-center justify-center gap-2.5">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="#FAF6EC"><path d="M12 2C8 8 6 12 6 16a6 6 0 0012 0c0-4-2-8-6-14z"/></svg>
+                <span>Je viens de l'arroser</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Caractéristiques -->
+          <div class="px-6 pt-6">
+            <h3 class="font-serif text-lg text-ink-800 mb-3 px-1">Sa fiche</h3>
+            <div class="grid grid-cols-2 gap-3">
+              <div class="bg-paper-50 card-organic-2 border border-paper-200 p-3">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#C4583E" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="4"/><path d="M12 3v1M12 20v1M3 12h1M20 12h1M5.6 5.6l.7.7M17.7 17.7l.7.7M5.6 18.4l.7-.7M17.7 6.3l.7-.7"/></svg>
+                <p class="text-[11px] uppercase tracking-wider text-ink-400 mt-2 font-semibold">Lumière</p>
+                <p class="font-serif text-base text-ink-800 mt-0.5">Indirecte vive</p>
+              </div>
+              <div class="bg-paper-50 card-organic-3 border border-paper-200 p-3">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#5C6F4F" stroke-width="1.6" stroke-linecap="round"><path d="M12 3C8 8 5 11 5 15a7 7 0 0014 0c0-4-3-7-7-12z"/></svg>
+                <p class="text-[11px] uppercase tracking-wider text-ink-400 mt-2 font-semibold">Humidité</p>
+                <p class="font-serif text-base text-ink-800 mt-0.5">Élevée</p>
+              </div>
+              <div class="bg-paper-50 card-organic-1 border border-paper-200 p-3">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#C4583E" stroke-width="1.6" stroke-linecap="round"><path d="M14 4v9a4 4 0 11-4 0V4a2 2 0 014 0z"/><circle cx="12" cy="17" r="2"/></svg>
+                <p class="text-[11px] uppercase tracking-wider text-ink-400 mt-2 font-semibold">Température</p>
+                <p class="font-serif text-base text-ink-800 mt-0.5">18-25°C</p>
+              </div>
+              <div class="bg-paper-50 card-organic-2 border border-paper-200 p-3">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#5C6F4F" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 6v6l4 2"/></svg>
+                <p class="text-[11px] uppercase tracking-wider text-ink-400 mt-2 font-semibold">Fréquence</p>
+                <p class="font-serif text-base text-ink-800 mt-0.5">tous les 7 j</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Historique -->
+          <div class="px-6 pt-7 pb-32">
+            <h3 class="font-serif text-lg text-ink-800 mb-3 px-1">Historique</h3>
+            <div class="bg-white card-organic-3 shadow-paper p-4 space-y-4">
+              <div class="flex gap-3">
+                <div class="w-8 h-8 rounded-full bg-terracotta-100 border border-terracotta-200 flex items-center justify-center shrink-0">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="#C4583E"><path d="M12 2C8 8 6 12 6 16a6 6 0 0012 0c0-4-2-8-6-14z"/></svg>
+                </div>
+                <div class="flex-1">
+                  <p class="font-serif text-sm text-ink-800">Arrosée</p>
+                  <p class="text-xs text-ink-400">il y a 9 jours · 12 cl</p>
+                </div>
+              </div>
+              <div class="filet-h"></div>
+              <div class="flex gap-3">
+                <div class="w-8 h-8 rounded-full bg-moss-100 border border-moss-200 flex items-center justify-center shrink-0">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5C6F4F" stroke-width="2"><path d="M12 3v18M5 12h14"/></svg>
+                </div>
+                <div class="flex-1">
+                  <p class="font-serif text-sm text-ink-800">Rempotée</p>
+                  <p class="text-xs text-ink-400">il y a 1 mois</p>
+                </div>
+              </div>
+              <div class="filet-h"></div>
+              <div class="flex gap-3">
+                <div class="w-8 h-8 rounded-full bg-paper-200 border border-paper-300 flex items-center justify-center shrink-0">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5A4A40" stroke-width="2" stroke-linecap="round"><path d="M5 12h14M12 5v14"/></svg>
+                </div>
+                <div class="flex-1">
+                  <p class="font-serif text-sm text-ink-800">Adoptée</p>
+                  <p class="text-xs text-ink-400">il y a 4 mois</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============ SCREEN 3 — ADD PLANT ============ -->
+        <section class="screen screen-paper">
+          <div class="status-bar">
+            <span>9:41</span>
+            <span>·····</span>
+          </div>
+
+          <!-- Header -->
+          <div class="px-6 pt-1 pb-4 flex items-center justify-between">
+            <button class="w-10 h-10 rounded-full bg-white border border-paper-200 flex items-center justify-center shadow-paper">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2B1F1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+            </button>
+            <p class="text-[11px] uppercase tracking-[.25em] text-ink-400 font-semibold">Étape 1 · 2</p>
+            <div class="w-10"></div>
+          </div>
+
+          <!-- Title -->
+          <div class="px-7 pb-5 relative">
+            <svg class="leaf-deco" style="top:0; right:8px; width:80px; height:80px;" viewBox="0 0 80 80" fill="none">
+              <path d="M40 6 Q60 20 64 40 Q60 60 40 74 Q20 60 16 40 Q20 20 40 6 Z" stroke="#C4583E" stroke-width=".8" fill="none"/>
+              <path d="M40 6 L40 74" stroke="#C4583E" stroke-width=".6"/>
+            </svg>
+            <p class="text-[11px] uppercase tracking-[.25em] text-terracotta-600 font-semibold">Bienvenue</p>
+            <h2 class="font-serif text-3xl text-ink-800 leading-tight mt-1">Une nouvelle<br/>colocataire ?</h2>
+            <p class="text-sm text-ink-600 mt-2">On commence par lui faire un portrait.</p>
+          </div>
+
+          <!-- Photo upload -->
+          <div class="px-6 mb-5">
+            <div class="bg-white card-organic-1 shadow-paper p-4 relative">
+              <div class="aspect-[4/3] rounded-[28px_36px_28px_36px] border-2 border-dashed border-paper-300 bg-paper-50 flex flex-col items-center justify-center gap-2.5">
+                <div class="w-14 h-14 rounded-full bg-terracotta-100 flex items-center justify-center">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#C4583E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/>
+                  </svg>
+                </div>
+                <p class="font-serif text-base text-ink-800">Prends-la en photo</p>
+                <p class="text-xs text-ink-400">ou choisis depuis la galerie</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Form -->
+          <div class="px-6 space-y-4 pb-32">
+            <div>
+              <label class="block text-[11px] uppercase tracking-wider text-ink-600 font-semibold mb-1.5 px-1">Petit nom</label>
+              <input type="text" placeholder="Mona, Pilou, Sergio…" class="input-organic w-full px-4 py-3.5 font-serif text-lg text-ink-800 placeholder:text-ink-400 placeholder:italic placeholder:font-sans placeholder:text-base">
+            </div>
+
+            <div>
+              <label class="block text-[11px] uppercase tracking-wider text-ink-600 font-semibold mb-1.5 px-1">Espèce</label>
+              <input type="text" placeholder="Monstera deliciosa" class="input-organic w-full px-4 py-3.5 italic font-serif text-base text-ink-800 placeholder:text-ink-400">
+            </div>
+
+            <div>
+              <label class="block text-[11px] uppercase tracking-wider text-ink-600 font-semibold mb-1.5 px-1">Arrosage tous les</label>
+              <div class="input-organic flex items-center px-4 py-2">
+                <button class="w-9 h-9 rounded-full bg-paper-100 border border-paper-200 flex items-center justify-center text-ink-800 font-bold">−</button>
+                <div class="flex-1 text-center">
+                  <span class="font-serif text-3xl text-ink-800">7</span>
+                  <span class="text-sm text-ink-600 ml-1.5">jours</span>
+                </div>
+                <button class="w-9 h-9 rounded-full bg-terracotta-500 flex items-center justify-center text-paper-50 font-bold shadow-paper">+</button>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-[11px] uppercase tracking-wider text-ink-600 font-semibold mb-1.5 px-1">Lumière qu'elle reçoit</label>
+              <div class="grid grid-cols-3 gap-2">
+                <button class="bg-white card-organic-3 border border-paper-200 px-2 py-3 text-center">
+                  <p class="text-xl">🌑</p>
+                  <p class="text-[11px] text-ink-600 font-medium mt-0.5">Faible</p>
+                </button>
+                <button class="bg-terracotta-500 card-organic-1 px-2 py-3 text-center shadow-paper">
+                  <p class="text-xl">🌗</p>
+                  <p class="text-[11px] text-paper-50 font-semibold mt-0.5">Indirecte</p>
+                </button>
+                <button class="bg-white card-organic-2 border border-paper-200 px-2 py-3 text-center">
+                  <p class="text-xl">☀️</p>
+                  <p class="text-[11px] text-ink-600 font-medium mt-0.5">Vive</p>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sticky CTA -->
+          <div class="absolute bottom-0 left-0 right-0 px-6 pb-6 pt-3" style="background: linear-gradient(to top, #FAF6EC 60%, transparent);">
+            <button class="cta-water w-full py-4 font-semibold text-base flex items-center justify-center gap-2">
+              <span>Continuer</span>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FAF6EC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </button>
+          </div>
+        </section>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination dots -->
+  <div class="flex gap-2 mt-7" id="dots">
+    <button class="dot active" data-i="0" aria-label="Dashboard"></button>
+    <button class="dot" data-i="1" aria-label="Détail"></button>
+    <button class="dot" data-i="2" aria-label="Ajout"></button>
+  </div>
+
+  <!-- Caption -->
+  <div class="max-w-md mt-7 text-center text-xs text-ink-400 font-medium tracking-wide">
+    Dashboard · Détail Mona · Ajout — <span class="font-serif italic text-terracotta-600">swipe horizontal</span>
+  </div>
+
+<script>
+  const carousel = document.getElementById('carousel');
+  const dots = document.querySelectorAll('#dots .dot');
+  dots.forEach(d => d.addEventListener('click', () => {
+    carousel.scrollTo({ left: carousel.clientWidth * +d.dataset.i, behavior: 'smooth' });
+  }));
+  carousel.addEventListener('scroll', () => {
+    const i = Math.round(carousel.scrollLeft / carousel.clientWidth);
+    dots.forEach((d, idx) => d.classList.toggle('active', idx === i));
+  });
+</script>
+</body>
+</html>
