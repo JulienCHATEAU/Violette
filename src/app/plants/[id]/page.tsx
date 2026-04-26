@@ -44,6 +44,7 @@ export default async function PlantDetailPage({ params }: { params: { id: string
   const plant = await prisma.plant.findFirst({
     where: { id: params.id, ownerId: session.sub },
     include: { wateringLogs: { orderBy: { wateredAt: "desc" }, take: 15 } },
+    omit: { photo: true },
   });
   if (!plant) notFound();
 

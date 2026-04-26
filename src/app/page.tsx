@@ -31,6 +31,7 @@ export default async function Dashboard() {
   const plants = await prisma.plant.findMany({
     where: { ownerId: session.sub },
     orderBy: { createdAt: "desc" },
+    omit: { photo: true },
   });
 
   const withStatus = plants.map((p) => ({ p, w: computeWatering(p.lastWateredAt, p.wateringFrequencyDays) }));

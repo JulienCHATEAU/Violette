@@ -26,6 +26,7 @@ export default async function PlantsListPage() {
   const plants = await prisma.plant.findMany({
     where: { ownerId: session.sub },
     orderBy: { name: "asc" },
+    omit: { photo: true },
   });
 
   return (

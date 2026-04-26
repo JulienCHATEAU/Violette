@@ -17,7 +17,7 @@ export default async function EditPlantPage({ params }: { params: { id: string }
   const session = await getSession();
   if (!session) redirect("/login");
 
-  const plant = await prisma.plant.findFirst({ where: { id: params.id, ownerId: session.sub } });
+  const plant = await prisma.plant.findFirst({ where: { id: params.id, ownerId: session.sub }, omit: { photo: true } });
   if (!plant) notFound();
 
   const title = plant.nickname || plant.name;
