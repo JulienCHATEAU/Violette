@@ -1,7 +1,7 @@
 "use client";
 
 import { forwardRef } from "react";
-import type { InputHTMLAttributes, ReactNode } from "react";
+import type { InputHTMLAttributes, ReactNode, TextareaHTMLAttributes } from "react";
 import { cn } from "../lib/cn";
 
 /* ────────────────────────────────────────────────────────────────────────── */
@@ -28,6 +28,42 @@ export const TextInput = forwardRef<HTMLInputElement, TextInputProps>(function T
       className={cn(
         "block w-full font-sans text-base text-ink-800 bg-paper-50",
         "border border-paper-300 rounded-organic-3 px-4 py-3",
+        "placeholder:font-serif placeholder:italic placeholder:text-ink-400",
+        "transition-shadow duration-180 ease-organic",
+        "focus:outline-none focus:ring-4 focus:ring-terracotta-500/20 focus:border-terracotta-400",
+        "disabled:opacity-60 disabled:cursor-not-allowed",
+        invalid && "border-terracotta-500 focus:ring-terracotta-500/30",
+        className,
+      )}
+      {...rest}
+    />
+  );
+});
+
+/* ────────────────────────────────────────────────────────────────────────── */
+/* TextArea                                                                   */
+/* ────────────────────────────────────────────────────────────────────────── */
+
+export type TextAreaProps = TextareaHTMLAttributes<HTMLTextAreaElement> & {
+  invalid?: boolean;
+};
+
+/**
+ * TextArea — multi-line variant of TextInput, sharing focus ring and placeholder
+ * styling so they read as a coherent input family.
+ */
+export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(function TextArea(
+  { className, invalid, rows = 3, ...rest },
+  ref,
+) {
+  return (
+    <textarea
+      ref={ref}
+      rows={rows}
+      aria-invalid={invalid || undefined}
+      className={cn(
+        "block w-full font-sans text-base text-ink-800 bg-paper-50",
+        "border border-paper-300 rounded-organic-3 px-4 py-3 resize-y",
         "placeholder:font-serif placeholder:italic placeholder:text-ink-400",
         "transition-shadow duration-180 ease-organic",
         "focus:outline-none focus:ring-4 focus:ring-terracotta-500/20 focus:border-terracotta-400",

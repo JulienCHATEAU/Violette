@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { PageHeader, Section, ExampleCard, ExampleGrid } from "../Demo";
-import { TextInput, NumberStepper, SegmentedControl } from "@/design-system/components/Input";
+import { TextInput, TextArea, NumberStepper, SegmentedControl } from "@/design-system/components/Input";
 import { Sun, Cloud, Leaf } from "@/design-system/icons";
 import { Label } from "@/design-system/components/Typography";
 
@@ -35,6 +35,15 @@ export default function InputsPage() {
             </div>
           </ExampleCard>
         </ExampleGrid>
+      </Section>
+
+      <Section title="TextArea" description="Multi-line, mêmes tokens que TextInput. Resize vertical autorisé.">
+        <ExampleCard label="default" className="!justify-stretch !block">
+          <Label>Notes de soin</Label>
+          <div className="mt-2">
+            <TextArea placeholder="Adore les pulvérisations le matin…" rows={4} />
+          </div>
+        </ExampleCard>
       </Section>
 
       <Section title="NumberStepper" description="Cibles 44×44 (Fitts), valeur centrale en Fraunces 3xl.">

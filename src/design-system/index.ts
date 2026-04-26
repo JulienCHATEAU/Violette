@@ -27,9 +27,10 @@ export { Button } from "./components/Button";
 export type { ButtonProps, ButtonVariant, ButtonSize } from "./components/Button";
 export { Card } from "./components/Card";
 export type { CardProps, CardRadius, CardElevation, CardPadding } from "./components/Card";
-export { TextInput, NumberStepper, SegmentedControl } from "./components/Input";
+export { TextInput, TextArea, NumberStepper, SegmentedControl } from "./components/Input";
 export type {
   TextInputProps,
+  TextAreaProps,
   NumberStepperProps,
   SegmentedControlProps,
   SegmentOption,
