@@ -52,4 +52,6 @@ USER nextjs
 EXPOSE 3000
 
 # Apply pending migrations, then start the standalone Next.js server.
-CMD ["sh", "-c", "npx --no-install prisma migrate deploy && node server.js"]
+# Call the Prisma CLI launcher directly — node_modules/.bin is not copied
+# into the runner image, so `npx prisma` would fail to resolve.
+CMD ["sh", "-c", "node node_modules/prisma/build/index.js migrate deploy && node server.js"]
