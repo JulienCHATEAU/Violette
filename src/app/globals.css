@@ -8,23 +8,31 @@
   --fg: #2B1F1A;
 }
 
-html, body { height: 100%; }
 body {
   background: var(--bg);
   color: var(--fg);
   -webkit-tap-highlight-color: transparent;
   padding-top: env(safe-area-inset-top);
+  /* Mobile-first: kill the iOS rubber-band bounce on the root scroll container.
+     `contain` only prevents propagation; on iOS Safari the body itself still
+     bounces unless we set `none`. We accept losing native pull-to-refresh —
+     the app is a PWA, refresh is a non-event. */
+  overscroll-behavior: none;
 }
 
 .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
 
-/* Design system — paper grain texture, used as a subtle background on cards/panels. */
+/* Design system — paper grain texture, used as a subtle background on cards/panels.
+   `translateZ(0)` promotes the element to its own GPU layer so the radial-gradient
+   isn't repainted on every scroll frame on iOS Safari (was perceived as a vibration
+   at the end of long scrolls). */
 .paper-grain {
   background-image:
     radial-gradient(rgba(90, 74, 64, 0.04) 1px, transparent 1px),
     radial-gradient(rgba(90, 74, 64, 0.03) 1px, transparent 1px);
   background-size: 3px 3px, 7px 7px;
   background-position: 0 0, 1px 2px;
+  transform: translateZ(0);
 }
 
 /* Design system — Fraunces serif fine-tuning (stylistic sets + tighter tracking). */

@@ -24,7 +24,7 @@ type SunlightValue = NonNullable<PlantFormValues["sunlightExposure"]>;
 type HumidityValue = NonNullable<PlantFormValues["humidity"]>;
 
 const SUNLIGHT_OPTIONS = [
-  { value: "full_sun" as SunlightValue, label: "Plein soleil", icon: <Sun size={14} /> },
+  { value: "full_sun" as SunlightValue, label: "Soleil", icon: <Sun size={14} /> },
   { value: "partial_shade" as SunlightValue, label: "Mi-ombre", icon: <Cloud size={14} /> },
   { value: "shade" as SunlightValue, label: "Ombre", icon: <Cloud size={14} /> },
   { value: "indirect_light" as SunlightValue, label: "Indirecte", icon: <Leaf size={14} /> },
@@ -186,14 +186,13 @@ export function PlantForm({
                 </div>
               </Field>
               <Field id="sun" label="Exposition">
-                <div className="overflow-x-auto -mx-1 px-1 pb-1">
-                  <SegmentedControl<SunlightValue>
-                    ariaLabel="Exposition lumineuse"
-                    value={(values.sunlightExposure ?? "indirect_light") as SunlightValue}
-                    onChange={(v) => set("sunlightExposure", v)}
-                    options={SUNLIGHT_OPTIONS}
-                  />
-                </div>
+                <SegmentedControl<SunlightValue>
+                  ariaLabel="Exposition lumineuse"
+                  value={(values.sunlightExposure ?? "indirect_light") as SunlightValue}
+                  onChange={(v) => set("sunlightExposure", v)}
+                  options={SUNLIGHT_OPTIONS}
+                  orientation="vertical"
+                />
               </Field>
               <Field id="hum" label="Humidité">
                 <SegmentedControl<HumidityValue>
@@ -201,6 +200,7 @@ export function PlantForm({
                   value={(values.humidity ?? "medium") as HumidityValue}
                   onChange={(v) => set("humidity", v)}
                   options={HUMIDITY_OPTIONS}
+                  fullWidth
                 />
               </Field>
               <Field id="temp" label="Température">

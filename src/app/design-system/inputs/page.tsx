@@ -52,8 +52,11 @@ export default function InputsPage() {
         </ExampleCard>
       </Section>
 
-      <Section title="SegmentedControl" description="3-5 options exclusives, sélection en terracotta.">
-        <ExampleCard label="Exposition lumineuse">
+      <Section
+        title="SegmentedControl"
+        description="Choix mutuellement exclusifs. Décision matrix mobile-first : 3 options courtes (≤7 char) → horizontal fullWidth ; ≥4 options OU labels longs → vertical."
+      >
+        <ExampleCard label="default (inline)">
           <SegmentedControl<Light>
             ariaLabel="Exposition lumineuse"
             value={light}
@@ -62,6 +65,32 @@ export default function InputsPage() {
               { value: "low", label: "Faible", icon: <Cloud size={16} /> },
               { value: "indirect", label: "Indirecte", icon: <Leaf size={16} /> },
               { value: "bright", label: "Vive", icon: <Sun size={16} /> },
+            ]}
+          />
+        </ExampleCard>
+        <ExampleCard label="horizontal fullWidth (forms, ≤3 short labels)" className="!justify-stretch !block">
+          <SegmentedControl<Light>
+            ariaLabel="Exposition lumineuse"
+            value={light}
+            onChange={setLight}
+            fullWidth
+            options={[
+              { value: "low", label: "Faible", icon: <Cloud size={16} /> },
+              { value: "indirect", label: "Indirecte", icon: <Leaf size={16} /> },
+              { value: "bright", label: "Vive", icon: <Sun size={16} /> },
+            ]}
+          />
+        </ExampleCard>
+        <ExampleCard label="vertical (≥4 options OU labels longs)" className="!justify-stretch !block">
+          <SegmentedControl<Light>
+            ariaLabel="Exposition lumineuse"
+            value={light}
+            onChange={setLight}
+            orientation="vertical"
+            options={[
+              { value: "low", label: "Lumière faible", icon: <Cloud size={16} /> },
+              { value: "indirect", label: "Lumière indirecte", icon: <Leaf size={16} /> },
+              { value: "bright", label: "Lumière vive", icon: <Sun size={16} /> },
             ]}
           />
         </ExampleCard>

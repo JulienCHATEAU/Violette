@@ -46,6 +46,19 @@ Typo, renommage local, ajustement de style mineur, ajout d'un commentaire, forma
 
 Considère-la comme non triviale. Le coût d'un plan inutile est faible, le coût d'une exécution non alignée est élevé.
 
+### Commit à chaque étape validée
+
+Les commits se font au fil de l'eau, pas en batch en fin de session. Dès que je valide explicitement un ensemble de modifications cohérent **et** que je signale le passage à la suite ("go", "passe à l'étape suivante", "ok suivant", "parfait, on continue"), tu fais un commit avec ce qui vient d'être fait **avant** d'attaquer l'étape suivante.
+
+Règles :
+- Convention de §4 (`feat:`, `fix:`, `chore:`, `docs:`, `test:`, `refactor:`).
+- Titre court (<70 char) qui résume le sujet validé. Corps optionnel en bullet list pour les commits non triviaux.
+- `Co-Authored-By: Claude Opus 4.7 (1M context) <noreply@anthropic.com>` en footer.
+- `git add` ciblé sur les fichiers du sujet — jamais `git add .` ni `git add -A`.
+- **Jamais de push.** Cf. §11. Je push moi-même quand je suis prêt.
+- Si une simple validation ("ok") n'est pas accompagnée d'un signal de transition, tu attends — je peux vouloir compléter avant de figer.
+- Si je veux un commit séparé par sous-sujet à l'intérieur d'une grosse étape, je le demanderai. Sinon, un commit par étape suffit.
+
 ---
 
 ## 4. Conventions de code
@@ -104,6 +117,19 @@ Tout est importable via `@/design-system` ou ses sous-chemins (`@/design-system/
 - **Aucune classe Tailwind hardcodée pour des couleurs hors tokens** : `terracotta-*`, `moss-*`, `paper-*`, `ink-*` uniquement. Pas de `bg-violet-600`, pas de `text-rose-700` — la palette legacy violet/sage existe encore pour des écrans non-refondus mais ne doit plus apparaître dans le nouveau code.
 - **Animations** : `transform` et `opacity` uniquement. Respect `prefers-reduced-motion` (déjà géré globalement par `globals.css` + `useReducedMotion`).
 - **Lois UX** : toute décision de design doit être traçable à au moins une loi de [lawsofux.com](https://lawsofux.com). Citer la loi en JSDoc sur le composant ou la page concernée.
+
+### Mobile-first strict (non négociable)
+
+L'app est **utilisée à 95 % depuis un téléphone** (Railway + ngrok pendant le dev). Toute UI doit être validée à **375×667 (iPhone SE) AVANT** d'être considérée comme finie.
+
+- **Aucun composant ne doit déborder** ou nécessiter un scroll horizontal à 375px. Si tu te surprends à wrapper un composant dans `overflow-x-auto`, c'est un signal d'alarme — c'est probablement le composant lui-même qui doit s'adapter.
+- **Hit areas ≥ 44×44 px** (Fitts's Law). Vaut pour tous les boutons, liens tap, segments d'un `SegmentedControl`, items du Bottom Nav.
+- **Pas de media query desktop dans les composants applicatifs** ; le DS et le module de viz peuvent en avoir, pas les écrans utilisateurs.
+- **Composants à largeur variable** : tout composant que l'on intègre dans un form ou une `Card` doit pouvoir s'étirer (`w-full`, `flex-1`). Concrètement pour le DS :
+  - `SegmentedControl` → matrix de décision : **3 options courtes** (≤7 char) → `horizontal fullWidth` ; **≥4 options OU labels longs** → `orientation="vertical"`. Jamais de label tronqué visible à l'écran.
+  - `Button` → utiliser `className="w-full"` ou `flex-1` selon le layout.
+- **Chaque écran refondu doit être testé via ngrok depuis un vrai téléphone** avant d'être validé. Le rendu DevTools en mode mobile ne suffit pas (gestes, scroll iOS, safe areas, frappe clavier).
+- **Pas de classes responsives qui activent un mode "desktop only"** sans avoir d'abord assuré que le mobile est nickel.
 
 ### Module de visualisation
 

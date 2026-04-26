@@ -161,17 +161,36 @@ export type SegmentOption<T extends string> = {
   icon?: ReactNode;
 };
 
+export type SegmentedControlOrientation = "horizontal" | "vertical";
+
 export type SegmentedControlProps<T extends string> = {
   value: T;
   onChange: (next: T) => void;
   options: ReadonlyArray<SegmentOption<T>>;
   ariaLabel: string;
   className?: string;
+  /**
+   * Stretch to fill the parent width with equally-distributed segments.
+   * Always use this in forms on mobile to avoid horizontal overflow.
+   * Ignored when `orientation="vertical"` (vertical is always full-width).
+   */
+  fullWidth?: boolean;
+  /**
+   * `horizontal` (default) — pill-style row, segments side by side.
+   * `vertical` — stacked rows, label visible in full. Use this whenever the
+   * options exceed 3 OR labels are >7 characters, to keep mobile layouts
+   * comfortable without truncation.
+   */
+  orientation?: SegmentedControlOrientation;
 };
 
 /**
  * SegmentedControl — radio-style picker with an inline visual highlight.
  * Use for short, mutually exclusive choices (3-5 options max).
+ *
+ * Mobile-first decision matrix:
+ *  - 3 short options (≤7 chars) → `orientation="horizontal" fullWidth`
+ *  - ≥4 options OR labels >7 chars → `orientation="vertical"`
  */
 export function SegmentedControl<T extends string>({
   value,
@@ -179,13 +198,19 @@ export function SegmentedControl<T extends string>({
   options,
   ariaLabel,
   className,
+  fullWidth = false,
+  orientation = "horizontal",
 }: SegmentedControlProps<T>) {
+  const isVertical = orientation === "vertical";
   return (
     <div
       role="radiogroup"
       aria-label={ariaLabel}
       className={cn(
-        "inline-flex p-1 bg-paper-100 border border-paper-200 rounded-pill-organic gap-1",
+        "p-1 bg-paper-100 border border-paper-200 gap-1",
+        isVertical
+          ? "flex flex-col w-full rounded-organic-3"
+          : "rounded-pill-organic " + (fullWidth ? "flex w-full" : "inline-flex"),
         className,
       )}
     >
@@ -199,16 +224,20 @@ export function SegmentedControl<T extends string>({
             aria-checked={selected}
             onClick={() => onChange(opt.value)}
             className={cn(
-              "inline-flex items-center gap-1.5 px-4 h-10 rounded-pill-organic font-sans text-sm font-medium",
+              "inline-flex items-center font-sans font-medium",
               "transition-colors duration-180 ease-organic",
               "focus:outline-none focus-visible:ring-4 focus-visible:ring-terracotta-500/20",
+              isVertical
+                ? "w-full justify-start gap-3 h-12 px-4 text-base rounded-pill-organic"
+                : "justify-center gap-1.5 h-10 text-sm rounded-pill-organic " +
+                    (fullWidth ? "flex-1 min-w-0 px-2 sm:px-3" : "px-3 sm:px-4"),
               selected
                 ? "bg-terracotta-500 text-paper-50 shadow-paper"
                 : "text-ink-600 hover:text-ink-800 hover:bg-paper-50",
             )}
           >
             {opt.icon}
-            <span>{opt.label}</span>
+            <span className={isVertical ? "" : "truncate"}>{opt.label}</span>
           </button>
         );
       })}
