@@ -2,7 +2,6 @@ import "./globals.css";
 import type { Metadata, Viewport } from "next";
 import { Fraunces, Plus_Jakarta_Sans } from "next/font/google";
 import { Nav } from "@/components/Nav";
-import { Agentation } from "agentation";
 
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -44,7 +43,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-screen flex flex-col font-sans">
         <main className="flex-1 w-full max-w-xl mx-auto px-6 sm:px-8 pt-8 pb-32">{children}</main>
         <Nav />
-        {process.env.NODE_ENV === "development" && <Agentation />}
       </body>
     </html>
   );
