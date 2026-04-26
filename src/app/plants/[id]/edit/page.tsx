@@ -1,13 +1,18 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { ChevronLeft } from "lucide-react";
 import { prisma } from "@/lib/db";
 import { PlantForm } from "@/components/PlantForm";
 import { getSession } from "@/lib/auth/session";
 import type { HumidityLevel, SunlightExposure } from "@/lib/zod-schemas";
+import { H1, Italic } from "@/design-system/components/Typography";
+import { ArrowLeft } from "@/design-system/icons";
 
 export const dynamic = "force-dynamic";
 
+/**
+ * Edit plant — same `PlantForm` as the create flow, hydrated with current values.
+ * Back link returns to the plant detail (vs. the list for the create flow).
+ */
 export default async function EditPlantPage({ params }: { params: { id: string } }) {
   const session = await getSession();
   if (!session) redirect("/login");
@@ -15,17 +20,24 @@ export default async function EditPlantPage({ params }: { params: { id: string }
   const plant = await prisma.plant.findFirst({ where: { id: params.id, ownerId: session.sub } });
   if (!plant) notFound();
 
+  const title = plant.nickname || plant.name;
+
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-3">
         <Link
           href={`/plants/${plant.id}`}
-          aria-label="Retour"
-          className="inline-flex items-center text-violet-700 dark:text-violet-300"
+          aria-label="Retour à la fiche"
+          className="inline-flex items-center justify-center w-11 h-11 rounded-full bg-paper-50 border border-paper-200 text-ink-600 shadow-paper hover:bg-paper-100 transition-colors duration-180 ease-organic focus:outline-none focus-visible:ring-4 focus-visible:ring-terracotta-500/20"
         >
-          <ChevronLeft size={24} strokeWidth={1.8} />
+          <ArrowLeft size={20} />
         </Link>
-        <h1 className="text-2xl font-bold">Modifier</h1>
+        <div>
+          <H1 className="text-3xl">Modifier</H1>
+          <p className="font-serif italic text-ink-600 text-base">
+            <Italic className="text-ink-600">Affine la fiche de {title}.</Italic>
+          </p>
+        </div>
       </div>
       <PlantForm
         mode="edit"
