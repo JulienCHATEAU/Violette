@@ -23,7 +23,7 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
   if (!plant || !plant.photo) {
     return NextResponse.json({ error: "not_found" }, { status: 404 });
   }
-  return new NextResponse(plant.photo, {
+  return new NextResponse(new Uint8Array(plant.photo), {
     status: 200,
     headers: {
       "Content-Type": plant.photoMime ?? "image/jpeg",
