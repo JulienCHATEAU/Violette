@@ -81,7 +81,53 @@ Considère-la comme non triviale. Le coût d'un plan inutile est faible, le coû
 
 ---
 
-## 5. Tests — règle systématique
+## 5. Design system Violette
+
+Le design system vit sous `src/design-system/`. Direction visuelle : **Herbier moderne** — palette terracotta / moss / paper / ink, typo Fraunces (serif) + Plus Jakarta Sans (sans), formes organiques, ombres papier, micro-animations framer-motion.
+
+### Emplacement
+
+```
+src/design-system/
+  tokens/                # colors, motion, radii (re-export TS des tokens Tailwind)
+  components/            # Button, Card, Input, Badge, PlantBubble, WaterCTA, Dialog, Typography…
+  icons/                 # set custom de 14+ icônes line-art
+  lib/cn.ts              # helper de classNames local (pas de clsx)
+  index.ts               # barrel export — point d'entrée unique
+```
+
+Tout est importable via `@/design-system` ou ses sous-chemins (`@/design-system/components/Button`, `@/design-system/icons`, etc.).
+
+### Règle d'usage (non négociable)
+
+- **Toujours utiliser les composants du DS** quand un équivalent existe (Button, Card, Badge, TextInput, etc.). Ne jamais re-créer un composant local quand le DS le fournit déjà.
+- **Aucune classe Tailwind hardcodée pour des couleurs hors tokens** : `terracotta-*`, `moss-*`, `paper-*`, `ink-*` uniquement. Pas de `bg-violet-600`, pas de `text-rose-700` — la palette legacy violet/sage existe encore pour des écrans non-refondus mais ne doit plus apparaître dans le nouveau code.
+- **Animations** : `transform` et `opacity` uniquement. Respect `prefers-reduced-motion` (déjà géré globalement par `globals.css` + `useReducedMotion`).
+- **Lois UX** : toute décision de design doit être traçable à au moins une loi de [lawsofux.com](https://lawsofux.com). Citer la loi en JSDoc sur le composant ou la page concernée.
+
+### Module de visualisation
+
+`/design-system` est accessible **uniquement en `NODE_ENV=development`** (gate côté serveur dans `src/app/design-system/layout.tsx`, exclu automatiquement du build prod). Sidebar avec une page par catégorie (Tokens, Typography, Buttons, Cards, Inputs, Badges, Dialogs, Plant bubbles, Icons, Motion). À ouvrir dès qu'on hésite sur quel composant ou variant utiliser.
+
+### Règle d'évolution (à appliquer à chaque ajout)
+
+Le DS **vit**. Chaque fois qu'un nouveau composant est nécessaire pour un écran :
+
+1. **Le créer dans `src/design-system/components/`** (PascalCase, `forwardRef`, prop `className` mergée via `cn()`, typé strict, JSDoc avec la loi UX appliquée).
+2. **L'exporter** depuis `src/design-system/index.ts`.
+3. **Créer une page de viz** correspondante dans `src/app/design-system/<category>/page.tsx` couvrant **tous les variants, tailles et états**.
+4. **Ajouter le lien dans la sidebar** (`src/app/design-system/Sidebar.tsx`).
+5. Pour une nouvelle icône : `src/design-system/icons/<Name>.tsx` + export dans `icons/index.ts` + ajout à la liste `ICONS` dans `src/app/design-system/icons/page.tsx`.
+
+Si un composant ad hoc est trop spécifique pour vivre dans le DS (ex: `WaterAction` qui orchestre du métier), il reste dans `src/components/` mais doit s'appuyer sur les primitives DS.
+
+### Pendant la refonte (Phase 2)
+
+Tant que tous les écrans n'ont pas été refondus, `lucide-react` et la palette `violet`/`sage` restent dans le `package.json` et le `tailwind.config.ts`. Ne pas les supprimer tant qu'un `grep` montre qu'un import résiduel existe — supprimer en fin de phase, après validation explicite.
+
+---
+
+## 6. Tests — règle systématique
 
 Les tests ne sont pas optionnels. Toute tâche qui ajoute ou modifie du comportement doit s'accompagner de tests.
 
@@ -123,7 +169,7 @@ Tâches qui **n'exigent pas** de tests : modifications purement visuelles (Tailw
 
 ---
 
-## 6. Roadmap (3 objectifs prioritaires)
+## 7. Roadmap (3 objectifs prioritaires)
 
 Voir `docs/roadmap.md` pour le détail. Ordre figé :
 
@@ -135,7 +181,7 @@ Ne pas commencer un objectif tant que le précédent n'est pas validé, sauf dem
 
 ---
 
-## 7. Zones à risque / pièges connus
+## 8. Zones à risque / pièges connus
 
 - **`public/uploads`** : ne survit pas en prod sur Railway. Toute évolution du flux photo doit garder en tête la migration vers volume persistant. Voir ADR à venir dans `docs/decisions.md`.
 - **SQLite vs Postgres** : certaines features Prisma diffèrent. Avant tout usage exotique, vérifier la compat Postgres.
@@ -147,7 +193,7 @@ Ne pas commencer un objectif tant que le précédent n'est pas validé, sauf dem
 
 ---
 
-## 8. Commandes utiles
+## 9. Commandes utiles
 
 ```bash
 # Dev
@@ -176,7 +222,7 @@ npm start
 
 ---
 
-## 9. Règles de communication
+## 10. Règles de communication
 
 - **Réponds en français** avec moi, sauf si je te demande autre chose.
 - **Pas de flatterie** ("Excellente question !", "Bien sûr !"). Va droit au but.
@@ -186,7 +232,7 @@ npm start
 
 ---
 
-## 10. Ce que tu ne fais jamais sans validation explicite
+## 11. Ce que tu ne fais jamais sans validation explicite
 
 - Modifier `prisma/schema.prisma` ou créer une migration.
 - Toucher au middleware ou à la logique d'auth.
@@ -195,3 +241,4 @@ npm start
 - Supprimer du code existant qui n'est pas directement lié à la tâche.
 - Faire un `git push`, un `git rebase`, ou réécrire l'historique.
 - Lancer une migration Prisma en mode prod.
+- Régresser le design system : supprimer un composant, en changer la signature publique, ou casser une page de viz `/design-system/*`.
