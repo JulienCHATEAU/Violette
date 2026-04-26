@@ -44,5 +44,9 @@ export type { WaterCTAProps, WaterCTAState, WaterCTASize } from "./components/Wa
 export { ConfirmDialog } from "./components/Dialog";
 export type { ConfirmDialogProps } from "./components/Dialog";
 
+// Decorations
+export { BotanicalLeaf } from "./decorations/BotanicalLeaf";
+export type { BotanicalLeafProps } from "./decorations/BotanicalLeaf";
+
 // Icons
 export * from "./icons";

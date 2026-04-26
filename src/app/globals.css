@@ -38,6 +38,13 @@ body {
 /* Design system — Fraunces serif fine-tuning (stylistic sets + tighter tracking). */
 .font-serif { font-feature-settings: "ss01", "ss02"; letter-spacing: -0.01em; }
 
+/* Design system — herbier-style horizontal divider, used to separate page header
+   blocks from sections without resorting to a hard border. */
+.filet-h {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(90, 74, 64, 0.25), transparent);
+}
+
 /* Accessibility — global motion guard. Components also check this at runtime when needed. */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

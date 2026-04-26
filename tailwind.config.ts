@@ -66,9 +66,14 @@ const config: Config = {
           "0%, 100%": { transform: "translateY(0) rotate(var(--bubble-tilt, -3deg))" },
           "50%": { transform: "translateY(-4px) rotate(calc(var(--bubble-tilt, -3deg) + 1deg))" },
         },
+        "drop-pulse": {
+          "0%, 100%": { transform: "scale(1)", opacity: "1" },
+          "50%": { transform: "scale(1.15)", opacity: "0.85" },
+        },
       },
       animation: {
         "bubble-float": "bubble-float 5s ease-in-out infinite",
+        "drop-pulse": "drop-pulse 1.6s ease-in-out infinite",
       },
     },
   },
