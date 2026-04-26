@@ -32,3 +32,8 @@ public/fallback-*.js
 *.log
 .vscode
 .idea
+
+# local tooling
+.agents/
+.claude/
+skills-lock.json
