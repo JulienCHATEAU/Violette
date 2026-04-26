@@ -1,6 +1,8 @@
 "use client";
+
 import { useEffect, useState } from "react";
-import { Bell, BellOff, Send } from "lucide-react";
+import { Button } from "@/design-system/components/Button";
+import { Bell, BellOff, Info, Send } from "@/design-system/icons";
 
 type PermState = "default" | "granted" | "denied" | "unsupported";
 
@@ -13,6 +15,14 @@ function urlBase64ToUint8Array(base64: string): Uint8Array {
   return arr;
 }
 
+/**
+ * NotificationPermission — UI surface for the web-push opt-in flow.
+ *
+ * UI was repainted to use the design system (Button + DS icons + paper palette).
+ * The push subscription pipeline (VAPID, syncSubscription, enable, sendTest,
+ * unsubscribe, console-based debug logs) is preserved verbatim — see CLAUDE.md §8
+ * which puts the push backend out of scope for this phase.
+ */
 export function NotificationPermission() {
   const [state, setState] = useState<PermState>("default");
   const [busy, setBusy] = useState(false);
@@ -176,9 +186,12 @@ export function NotificationPermission() {
 
   if (state === "unsupported") {
     return (
-      <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm">
-        Ton navigateur ne supporte pas les notifications push. Essaie depuis Chrome/Firefox, ou sur iOS
-        installe Violette comme PWA (iOS 16.4+).
+      <div className="flex items-start gap-3 rounded-organic-3 border border-paper-300 bg-paper-100 p-4 text-sm text-ink-800">
+        <Info size={18} className="text-ink-600 mt-0.5 shrink-0" />
+        <p className="font-sans leading-relaxed">
+          Ton navigateur ne supporte pas les notifications push. Essaie depuis Chrome/Firefox, ou sur iOS
+          installe Violette comme PWA (iOS 16.4+).
+        </p>
       </div>
     );
   }
@@ -186,43 +199,50 @@ export function NotificationPermission() {
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap gap-2">
-        {state !== "granted" && (
-          <button
+        {state !== "granted" ? (
+          <Button
+            type="button"
+            variant="cta"
+            size="sm"
             onClick={enable}
             disabled={busy}
-            className="inline-flex items-center gap-1.5 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-semibold px-4 py-2 disabled:opacity-60 transition"
+            leadingIcon={<Bell size={16} />}
           >
-            <Bell size={16} strokeWidth={2} />
             {busy ? "…" : "Activer les notifications"}
-          </button>
-        )}
-        {state === "granted" && (
+          </Button>
+        ) : null}
+        {state === "granted" ? (
           <>
-            <button
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
               onClick={sendTest}
               disabled={busy}
-              className="inline-flex items-center gap-1.5 rounded-xl border border-violet-200 text-violet-700 hover:bg-violet-50 px-4 py-2 font-medium transition"
+              leadingIcon={<Send size={16} />}
             >
-              <Send size={16} strokeWidth={2} />
               Envoyer un test
-            </button>
-            <button
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
               onClick={unsubscribe}
               disabled={busy}
-              className="inline-flex items-center gap-1.5 rounded-xl border border-rose-200 text-rose-700 hover:bg-rose-50 px-4 py-2 font-medium transition"
+              leadingIcon={<BellOff size={16} />}
+              className="!text-terracotta-600 hover:!bg-terracotta-50"
             >
-              <BellOff size={16} strokeWidth={2} />
               Désactiver
-            </button>
+            </Button>
           </>
-        )}
+        ) : null}
       </div>
-      {state === "denied" && (
-        <p className="text-sm text-rose-700">
+      {state === "denied" ? (
+        <p className="font-sans text-sm text-terracotta-600" role="alert">
           Les notifications sont bloquées. Ouvre les réglages du site dans ton navigateur et autorise-les.
         </p>
-      )}
-      {msg && <p className="text-sm text-zinc-600 dark:text-zinc-300">{msg}</p>}
+      ) : null}
+      {msg ? <p className="font-sans text-sm text-ink-600">{msg}</p> : null}
     </div>
   );
 }

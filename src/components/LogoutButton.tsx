@@ -1,7 +1,9 @@
 "use client";
+
 import { useRouter } from "next/navigation";
 import { useTransition } from "react";
-import { LogOut } from "lucide-react";
+import { Button } from "@/design-system/components/Button";
+import { LogOut } from "@/design-system/icons";
 
 export function LogoutButton() {
   const router = useRouter();
@@ -13,14 +15,16 @@ export function LogoutButton() {
       router.refresh();
     });
   return (
-    <button
+    <Button
       type="button"
+      variant="ghost"
+      size="sm"
       onClick={onClick}
       disabled={pending}
-      className="inline-flex items-center gap-1.5 rounded-xl border border-rose-200 text-rose-700 hover:bg-rose-50 px-4 py-2 text-sm font-medium disabled:opacity-60 transition"
+      leadingIcon={<LogOut size={16} />}
+      className="!text-terracotta-600 hover:!bg-terracotta-50"
     >
-      <LogOut size={16} strokeWidth={2} />
       {pending ? "Déconnexion…" : "Se déconnecter"}
-    </button>
+    </Button>
   );
 }

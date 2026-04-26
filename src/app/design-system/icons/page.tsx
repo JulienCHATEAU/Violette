@@ -14,6 +14,13 @@ import {
   Sparkles,
   Settings,
   Trash,
+  Bell,
+  BellOff,
+  LogOut,
+  Info,
+  Smartphone,
+  User,
+  Send,
 } from "@/design-system/icons";
 
 const ICONS = [
@@ -31,6 +38,13 @@ const ICONS = [
   { name: "Sparkles", Comp: Sparkles },
   { name: "Settings", Comp: Settings },
   { name: "Trash", Comp: Trash },
+  { name: "Bell", Comp: Bell },
+  { name: "BellOff", Comp: BellOff },
+  { name: "LogOut", Comp: LogOut },
+  { name: "Info", Comp: Info },
+  { name: "Smartphone", Comp: Smartphone },
+  { name: "User", Comp: User },
+  { name: "Send", Comp: Send },
 ] as const;
 
 export default function IconsPage() {
@@ -38,7 +52,7 @@ export default function IconsPage() {
     <>
       <PageHeader
         title="Icons"
-        lead="Set custom 12 icônes line-art : stroke 1.6, linecap round. Identité visuelle de Violette — préférer ce set à lucide-react pour les écrans de production."
+        lead="Set custom line-art : stroke 1.6, linecap round. Identité visuelle de Violette — utiliser exclusivement ces icônes en production. Ajouter une nouvelle icône → composant DS + export + cette grille."
       />
 
       <Section title="Le set complet">
