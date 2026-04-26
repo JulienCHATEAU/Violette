@@ -1,22 +1,44 @@
 import { redirect } from "next/navigation";
-import { Flower2 } from "lucide-react";
 import { getSession } from "@/lib/auth/session";
+import { Leaf } from "@/design-system/icons";
+import { H1, Italic } from "@/design-system/components/Typography";
 import { LoginForm } from "./LoginForm";
 
 export const dynamic = "force-dynamic";
 
+/**
+ * Login screen — entry point for unauthenticated users.
+ *
+ * Laws of UX:
+ *  - Aesthetic-Usability Effect: paper background, organic logo halo, Fraunces voice.
+ *  - Peak-End Rule (lite): the personified subtitle establishes the app's tone before
+ *    the user even reaches the dashboard.
+ *
+ * Visual escape from the root <main> wrapper: negative margins extend the paper
+ * background to the full viewport, overriding the body's `--bg` for this screen only.
+ * `colorScheme: light` prevents the OS dark-mode preference from inverting our palette.
+ */
 export default async function LoginPage() {
   const session = await getSession();
   if (session) redirect("/");
+
   return (
-    <div className="min-h-[70vh] flex flex-col items-center justify-center gap-8">
-      <div className="text-center space-y-2">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-violet-100 text-violet-700">
-          <Flower2 size={36} strokeWidth={1.6} />
+    <div
+      className="-mx-6 sm:-mx-8 -mt-8 -mb-32 px-6 sm:px-8 pt-12 pb-32 min-h-screen bg-paper-50 paper-grain flex flex-col items-center justify-center gap-10"
+      style={{ colorScheme: "light" }}
+    >
+      <header className="text-center space-y-4">
+        <div
+          className="inline-flex items-center justify-center w-16 h-16 rounded-organic-2 bg-terracotta-50 border border-terracotta-200 shadow-paper text-terracotta-500"
+          aria-hidden="true"
+        >
+          <Leaf size={36} />
         </div>
-        <h1 className="text-3xl font-bold tracking-tight text-violet-700">Violette</h1>
-        <p className="text-sm text-zinc-500">Connecte-toi pour voir tes plantes.</p>
-      </div>
+        <H1 className="text-ink-800">Violette</H1>
+        <p className="font-serif italic text-ink-600 text-base">
+          <Italic className="text-ink-600">Tes plantes t&apos;attendent.</Italic>
+        </p>
+      </header>
       <LoginForm />
     </div>
   );
