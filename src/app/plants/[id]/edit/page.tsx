@@ -1,18 +1,20 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
-import { PlantForm } from "@/components/PlantForm";
+import { EditPlantPanel } from "@/components/EditPlantPanel";
 import { PhotoUpload } from "@/components/PhotoUpload";
 import { getSession } from "@/lib/auth/session";
 import type { HumidityLevel, SunlightExposure } from "@/lib/zod-schemas";
 import { Card } from "@/design-system/components/Card";
 import { H1, H3, Body, Italic } from "@/design-system/components/Typography";
+import { BotanicalLeaf } from "@/design-system/decorations/BotanicalLeaf";
 import { ArrowLeft, Camera, Leaf } from "@/design-system/icons";
 
 export const dynamic = "force-dynamic";
 
 /**
- * Edit plant — same `PlantForm` as the create flow, hydrated with current values.
+ * Edit plant — same `PlantForm` as the create flow, hydrated with current values,
+ * with a sticky bottom CTA matching the wizard pattern.
  *
  * Photo management lives here (moved from the detail screen, which now stays a
  * pure read view). The card shows the current thumbnail when available so the
@@ -30,16 +32,20 @@ export default async function EditPlantPage({ params }: { params: { id: string }
   const photoUrl = hasPhoto ? `/api/plants/${plant.id}/photo?v=${plant.updatedAt.getTime()}` : null;
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-3">
+    <div className="space-y-6 pb-32">
+      <div className="relative flex items-center gap-3">
+        <BotanicalLeaf
+          size={96}
+          className="absolute -top-4 right-0 text-moss-500 opacity-25 z-0 pointer-events-none"
+        />
         <Link
           href={`/plants/${plant.id}`}
           aria-label="Retour à la fiche"
-          className="inline-flex items-center justify-center w-11 h-11 rounded-full bg-paper-50 border border-paper-200 text-ink-600 shadow-paper hover:bg-paper-100 transition-colors duration-180 ease-organic focus:outline-none focus-visible:ring-4 focus-visible:ring-terracotta-500/20"
+          className="relative z-10 inline-flex items-center justify-center w-11 h-11 rounded-full bg-paper-50 border border-paper-200 text-ink-600 shadow-paper hover:bg-paper-100 transition-colors duration-180 ease-organic focus:outline-none focus-visible:ring-4 focus-visible:ring-terracotta-500/20"
         >
           <ArrowLeft size={20} />
         </Link>
-        <div>
+        <div className="relative z-10">
           <H1 className="text-3xl">Modifier</H1>
           <p className="font-serif italic text-ink-600 text-base">
             <Italic className="text-ink-600">Affine la fiche de {title}.</Italic>
@@ -74,8 +80,7 @@ export default async function EditPlantPage({ params }: { params: { id: string }
         <PhotoUpload plantId={plant.id} hasPhoto={hasPhoto} />
       </Card>
 
-      <PlantForm
-        mode="edit"
+      <EditPlantPanel
         plantId={plant.id}
         initial={{
           name: plant.name,

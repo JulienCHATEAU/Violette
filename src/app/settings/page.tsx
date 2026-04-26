@@ -3,6 +3,7 @@ import { LogoutButton } from "@/components/LogoutButton";
 import { getSession } from "@/lib/auth/session";
 import { Card } from "@/design-system/components/Card";
 import { H1, H3, Body, Italic } from "@/design-system/components/Typography";
+import { BotanicalLeaf } from "@/design-system/decorations/BotanicalLeaf";
 import { Info, Smartphone, User } from "@/design-system/icons";
 
 export const dynamic = "force-dynamic";
@@ -25,12 +26,21 @@ export default async function SettingsPage() {
 
   return (
     <div className="space-y-6">
-      <header>
-        <H1 className="text-3xl">Réglages</H1>
-        <p className="mt-1 font-serif italic text-ink-600 text-base">
-          <Italic className="text-ink-600">Quelques réglages discrets.</Italic>
-        </p>
+      <header className="relative">
+        <BotanicalLeaf
+          size={110}
+          className="absolute -top-2 -right-3 text-moss-500 opacity-30 z-0"
+        />
+        <div className="relative z-10">
+          <p className="text-xs uppercase tracking-[.2em] text-ink-400 font-semibold">Coulisses</p>
+          <H1 className="mt-1 text-3xl">Réglages</H1>
+          <p className="mt-1.5 font-serif italic text-ink-600 text-base">
+            <Italic className="text-ink-600">Quelques réglages discrets.</Italic>
+          </p>
+        </div>
       </header>
+
+      <div className="filet-h" />
 
       <SettingsSection icon={<User size={18} className="text-moss-500" />} title="Compte">
         <Body className="text-sm text-ink-600">

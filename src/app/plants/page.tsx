@@ -6,7 +6,10 @@ import { PlantList } from "@/components/PlantList";
 import { Card } from "@/design-system/components/Card";
 import { Button } from "@/design-system/components/Button";
 import { H1, H3, Body, Italic } from "@/design-system/components/Typography";
+import { BotanicalLeaf } from "@/design-system/decorations/BotanicalLeaf";
 import { PlantPot, Plus } from "@/design-system/icons";
+
+
 
 export const dynamic = "force-dynamic";
 
@@ -15,8 +18,9 @@ export const dynamic = "force-dynamic";
  *
  * Laws of UX:
  *  - Hick's Law: single header CTA (Ajouter) — the bottom Nav already exposes the
- *    photo-first FAB, so this complements it for manual entry.
- *  - Aesthetic-Usability Effect: animated grid, occasional plant bubbles via
+ *    photo-first FAB, so this complements it for manual entry without photo.
+ *  - Aesthetic-Usability Effect: BotanicalLeaf accent + filet horizontal anchor
+ *    the herbarium identity; animated grid; occasional plant bubbles via
  *    `<PlantList>` budget.
  */
 export default async function PlantsListPage() {
@@ -29,23 +33,28 @@ export default async function PlantsListPage() {
     omit: { photo: true },
   });
 
+  const count = plants.length;
+  const eyebrow = count === 0 ? "Famille verte" : count === 1 ? "1 plante" : `${count} plantes`;
+
   return (
     <div className="space-y-6">
-      <header className="flex items-start justify-between gap-4">
-        <div>
-          <H1 className="text-ink-800">Mes plantes</H1>
-          <p className="mt-1 font-serif italic text-ink-600 text-base">
+      <header className="relative">
+        <BotanicalLeaf
+          size={120}
+          className="absolute -top-2 -right-3 text-moss-500 opacity-30 z-0"
+        />
+        <div className="relative z-10">
+          <p className="text-xs uppercase tracking-[.2em] text-ink-400 font-semibold">{eyebrow}</p>
+          <H1 className="mt-1 text-ink-800">Mes plantes</H1>
+          <p className="mt-1.5 font-serif italic text-ink-600 text-base">
             <Italic className="text-ink-600">Toute ta petite famille verte.</Italic>
           </p>
         </div>
-        <Link href="/plants/new" aria-label="Ajouter une plante">
-          <Button variant="cta" size="sm" leadingIcon={<Plus size={16} />}>
-            Ajouter
-          </Button>
-        </Link>
       </header>
 
-      {plants.length === 0 ? <EmptyState /> : <PlantList plants={plants} />}
+      <div className="filet-h" />
+
+      {count === 0 ? <EmptyState /> : <PlantList plants={plants} appendAddTile />}
     </div>
   );
 }

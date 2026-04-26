@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import type { PlantCreateInput } from "@/lib/zod-schemas";
 import { Card } from "@/design-system/components/Card";
@@ -56,10 +56,19 @@ export function PlantForm({
   mode,
   initial,
   plantId,
+  formId,
+  hideSubmitButtons = false,
+  onPendingChange,
 }: {
   mode: Mode;
   initial?: PlantFormValues;
   plantId?: string;
+  /** Stable id assigned to the underlying <form>, so a sticky CTA elsewhere can submit via `<button form={formId}>`. */
+  formId?: string;
+  /** Hide the Annuler / Créer-Modifier row (and the Supprimer button stays inside). The parent renders its own sticky CTA. */
+  hideSubmitButtons?: boolean;
+  /** Notified whenever the form's pending state changes — lets a sticky CTA reflect Enregistrement…. */
+  onPendingChange?: (pending: boolean) => void;
 }) {
   const router = useRouter();
   const [pending, start] = useTransition();
@@ -67,6 +76,10 @@ export function PlantForm({
   const [errorSeq, setErrorSeq] = useState(0);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const prefersReduced = useReducedMotion();
+
+  useEffect(() => {
+    onPendingChange?.(pending);
+  }, [pending, onPendingChange]);
 
   const [values, setValues] = useState<PlantFormValues>({
     name: "",
@@ -138,7 +151,7 @@ export function PlantForm({
     >
       <motion.div key={errorSeq} animate={shake} transition={{ duration: 0.32 }}>
         <Card radius="organic-1" elevation="paper" padding="lg">
-          <form onSubmit={onSubmit} className="space-y-6">
+          <form id={formId} onSubmit={onSubmit} className="space-y-6">
             {/* Section 1 — Identity */}
             <FormSection title="Identité">
               <Field id="name" label="Nom *">
@@ -247,24 +260,26 @@ export function PlantForm({
               </p>
             ) : null}
 
-            <div className="flex gap-3 pt-1">
-              <Button
-                type="button"
-                variant="ghost"
-                size="md"
-                onClick={() => router.back()}
-                className="flex-1"
-                disabled={pending}
-              >
-                Annuler
-              </Button>
-              <Button type="submit" variant="cta" size="md" disabled={pending} className="flex-1">
-                {pending ? "Enregistrement…" : mode === "create" ? "Créer" : "Modifier"}
-              </Button>
-            </div>
+            {hideSubmitButtons ? null : (
+              <div className="flex gap-3 pt-1">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="md"
+                  onClick={() => router.back()}
+                  className="flex-1"
+                  disabled={pending}
+                >
+                  Annuler
+                </Button>
+                <Button type="submit" variant="cta" size="md" disabled={pending} className="flex-1">
+                  {pending ? "Enregistrement…" : mode === "create" ? "Créer" : "Modifier"}
+                </Button>
+              </div>
+            )}
 
             {mode === "edit" && plantId ? (
-              <div className="pt-3">
+              <div className={hideSubmitButtons ? "pt-1" : "pt-3"}>
                 <Button
                   type="button"
                   variant="ghost"

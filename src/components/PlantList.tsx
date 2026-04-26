@@ -2,6 +2,7 @@
 
 import { useMemo } from "react";
 import { PlantCard, type PlantCardData } from "./PlantCard";
+import { AddPlantTile } from "./AddPlantTile";
 
 type Props = {
   plants: PlantCardData[];
@@ -9,6 +10,8 @@ type Props = {
   bubbleBudget?: number;
   /** Index offset, useful when several lists share the same staggered animation timeline. */
   indexOffset?: number;
+  /** Append a dashed "Ajouter une nouvelle plante" tile as the last cell of the grid. */
+  appendAddTile?: boolean;
 };
 
 /**
@@ -18,10 +21,10 @@ type Props = {
  * we allocate ~30% of visible cards (rounded down) to keep the personification subtle
  * even when the page is otherwise quiet.
  *
- * The cap is intentionally enforced here rather than in `pickMessage`: the lib
- * decides *what* a plant might say; the layout decides *who* gets to speak.
+ * When `appendAddTile` is set, an `<AddPlantTile>` placeholder closes the grid —
+ * used on the dedicated /plants screen as a calm alternative to a header CTA.
  */
-export function PlantList({ plants, bubbleBudget, indexOffset = 0 }: Props) {
+export function PlantList({ plants, bubbleBudget, indexOffset = 0, appendAddTile = false }: Props) {
   const slots = useMemo(() => {
     const budget = bubbleBudget ?? Math.floor(plants.length * 0.3);
     return new Set(plants.slice(0, Math.max(0, budget)).map((p) => p.id));
@@ -32,6 +35,7 @@ export function PlantList({ plants, bubbleBudget, indexOffset = 0 }: Props) {
       {plants.map((p, i) => (
         <PlantCard key={p.id} plant={p} index={indexOffset + i} bubbleSlot={slots.has(p.id)} />
       ))}
+      {appendAddTile ? <AddPlantTile index={indexOffset + plants.length} /> : null}
     </div>
   );
 }
