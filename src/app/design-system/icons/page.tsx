@@ -22,6 +22,7 @@ import {
   Smartphone,
   User,
   Send,
+  Edit,
 } from "@/design-system/icons";
 
 const ICONS = [
@@ -47,6 +48,7 @@ const ICONS = [
   { name: "Smartphone", Comp: Smartphone },
   { name: "User", Comp: User },
   { name: "Send", Comp: Send },
+  { name: "Edit", Comp: Edit },
 ] as const;
 
 export default function IconsPage() {

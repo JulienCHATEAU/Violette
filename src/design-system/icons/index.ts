@@ -21,3 +21,4 @@ export { Info } from "./Info";
 export { Smartphone } from "./Smartphone";
 export { User } from "./User";
 export { Send } from "./Send";
+export { Edit } from "./Edit";

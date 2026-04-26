@@ -2,16 +2,21 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { PlantForm } from "@/components/PlantForm";
+import { PhotoUpload } from "@/components/PhotoUpload";
 import { getSession } from "@/lib/auth/session";
 import type { HumidityLevel, SunlightExposure } from "@/lib/zod-schemas";
-import { H1, Italic } from "@/design-system/components/Typography";
-import { ArrowLeft } from "@/design-system/icons";
+import { Card } from "@/design-system/components/Card";
+import { H1, H3, Body, Italic } from "@/design-system/components/Typography";
+import { ArrowLeft, Camera, Leaf } from "@/design-system/icons";
 
 export const dynamic = "force-dynamic";
 
 /**
  * Edit plant — same `PlantForm` as the create flow, hydrated with current values.
- * Back link returns to the plant detail (vs. the list for the create flow).
+ *
+ * Photo management lives here (moved from the detail screen, which now stays a
+ * pure read view). The card shows the current thumbnail when available so the
+ * user knows what they're replacing.
  */
 export default async function EditPlantPage({ params }: { params: { id: string } }) {
   const session = await getSession();
@@ -21,6 +26,8 @@ export default async function EditPlantPage({ params }: { params: { id: string }
   if (!plant) notFound();
 
   const title = plant.nickname || plant.name;
+  const hasPhoto = !!plant.photoMime;
+  const photoUrl = hasPhoto ? `/api/plants/${plant.id}/photo?v=${plant.updatedAt.getTime()}` : null;
 
   return (
     <div className="space-y-6">
@@ -39,6 +46,34 @@ export default async function EditPlantPage({ params }: { params: { id: string }
           </p>
         </div>
       </div>
+
+      {/* Photo management */}
+      <Card radius="organic-2" elevation="paper" padding="lg" className="space-y-3">
+        <div className="flex items-center gap-2">
+          <Camera size={18} className="text-terracotta-500" />
+          <H3>Photo</H3>
+        </div>
+        <div
+          className="relative w-full aspect-[4/3] overflow-hidden bg-paper-100"
+          style={{ borderRadius: "28px 36px 28px 36px" }}
+        >
+          {photoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={photoUrl} alt={title} className="absolute inset-0 w-full h-full object-cover" />
+          ) : (
+            <div className="absolute inset-0 grid place-items-center text-moss-400 paper-grain" aria-hidden="true">
+              <Leaf size={48} />
+            </div>
+          )}
+        </div>
+        {!hasPhoto ? (
+          <Body className="text-sm text-ink-600">
+            Aucune photo pour l&apos;instant. Ajoute-en une pour la faire vivre dans tes listes.
+          </Body>
+        ) : null}
+        <PhotoUpload plantId={plant.id} hasPhoto={hasPhoto} />
+      </Card>
+
       <PlantForm
         mode="edit"
         plantId={plant.id}
