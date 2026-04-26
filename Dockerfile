@@ -44,6 +44,9 @@ COPY --from=builder --chown=nextjs:nodejs /app/node_modules/.prisma ./node_modul
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/@prisma ./node_modules/@prisma
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules/prisma ./node_modules/prisma
 
+# Helper script invoked by Northflank scheduled cron jobs
+COPY --from=builder --chown=nextjs:nodejs /app/scripts/cron-call.js ./scripts/cron-call.js
+
 # Mount a Northflank volume here. SQLite file lives at /data/prod.db.
 RUN mkdir -p /data && chown nextjs:nodejs /data
 VOLUME /data
