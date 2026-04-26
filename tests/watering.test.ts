@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { computeWatering, statusLabel } from "../src/lib/watering";
+import { computeWatering } from "../src/lib/watering";
 
 const DAY = 86_400_000;
 
@@ -32,14 +32,5 @@ describe("computeWatering", () => {
     const r = computeWatering(last, 7, now);
     expect(r.status).toBe("ok");
     expect(r.diffDays).toBe(6);
-  });
-});
-
-describe("statusLabel", () => {
-  it("translates statuses to French", () => {
-    expect(statusLabel("overdue")).toBe("En retard");
-    expect(statusLabel("due")).toBe("À arroser aujourd'hui");
-    expect(statusLabel("soon")).toBe("Demain");
-    expect(statusLabel("ok")).toBe("OK");
   });
 });

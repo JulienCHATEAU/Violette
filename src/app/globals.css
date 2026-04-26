@@ -4,8 +4,8 @@
 
 :root {
   color-scheme: light;
-  --bg: #faf8fc;
-  --fg: #2a1f36;
+  --bg: #FAF6EC;
+  --fg: #2B1F1A;
 }
 
 html, body { height: 100%; }
@@ -14,14 +14,6 @@ body {
   color: var(--fg);
   -webkit-tap-highlight-color: transparent;
   padding-top: env(safe-area-inset-top);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: dark;
-    --bg: #1a1324;
-    --fg: #ece6f4;
-  }
 }
 
 .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
