@@ -1,14 +1,29 @@
 "use client";
+
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Camera } from "lucide-react";
+import { motion, useReducedMotion } from "framer-motion";
+import { Camera } from "@/design-system/icons";
 import { compressImage } from "@/lib/image";
 
+/**
+ * CameraButton — primary FAB nested inside the bottom Nav.
+ *
+ * Laws of UX:
+ *  - Jakob's Law: conventional centered FAB pattern.
+ *  - Fitts's Law: 64px target in the thumb arc.
+ *  - Doherty Threshold: busy state shows immediately on tap; spinner masks the
+ *    multi-step compress → POST → upload pipeline.
+ *
+ * Business logic is unchanged from v2.1: compress photo locally, create a plant,
+ * upload the photo, then redirect to the edit screen.
+ */
 export function CameraButton() {
   const router = useRouter();
   const inputRef = useRef<HTMLInputElement>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const prefersReduced = useReducedMotion();
 
   const onFile = async (file: File) => {
     setError(null);
@@ -43,16 +58,25 @@ export function CameraButton() {
 
   return (
     <div className="relative flex flex-col items-center">
-      <button
+      <motion.button
         type="button"
         aria-label="Prendre une photo"
         onClick={() => inputRef.current?.click()}
         disabled={busy}
-        className="absolute -top-7 w-16 h-16 rounded-full bg-violet-600 hover:bg-violet-700 text-white shadow-lift ring-4 ring-white dark:ring-zinc-900 flex items-center justify-center disabled:opacity-60 transition"
+        whileTap={prefersReduced || busy ? undefined : { scale: 0.94 }}
+        transition={{ type: "spring", stiffness: 500, damping: 30 }}
+        className="absolute -top-7 w-16 h-16 rounded-full bg-gradient-to-b from-terracotta-500 to-terracotta-600 text-paper-50 shadow-lift ring-4 ring-paper-50 flex items-center justify-center disabled:opacity-70 transition-colors duration-180 ease-organic focus:outline-none focus-visible:ring-paper-50 focus-visible:ring-offset-0"
       >
-        {busy ? <span className="text-sm">…</span> : <Camera size={26} strokeWidth={2} />}
-      </button>
-      <span className="mt-10 mb-3 text-xs text-zinc-500">Photo</span>
+        {busy ? (
+          <span
+            className="h-6 w-6 rounded-full border-2 border-paper-50/60 border-t-paper-50 animate-spin"
+            aria-hidden="true"
+          />
+        ) : (
+          <Camera size={26} />
+        )}
+      </motion.button>
+      <span className="mt-10 mb-3 font-sans text-xs text-ink-400">Photo</span>
       <input
         ref={inputRef}
         type="file"
@@ -68,7 +92,7 @@ export function CameraButton() {
       {error && (
         <p
           role="alert"
-          className="fixed left-1/2 -translate-x-1/2 bottom-28 z-50 bg-rose-600 text-white text-sm px-3 py-2 rounded-lg shadow-lift"
+          className="fixed left-1/2 -translate-x-1/2 bottom-28 z-50 bg-terracotta-600 text-paper-50 font-sans text-sm px-4 py-2 rounded-pill-organic shadow-lift"
         >
           {error}
         </p>
