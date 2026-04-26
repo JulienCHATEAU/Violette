@@ -7,6 +7,7 @@ export { Thermometer } from "./Thermometer";
 export { Clock } from "./Clock";
 export { Camera } from "./Camera";
 export { Plus } from "./Plus";
+export { Minus } from "./Minus";
 export { ArrowLeft } from "./ArrowLeft";
 export { Home } from "./Home";
 export { PlantPot } from "./PlantPot";

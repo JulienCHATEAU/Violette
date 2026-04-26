@@ -15,7 +15,7 @@ export const PlantCreateInput = z.object({
   lastWateredAt: z.coerce.date().optional(),
   sunlightExposure: SunlightExposure.default("indirect_light"),
   humidity: HumidityLevel.default("medium"),
-  temperatureRange: z.string().max(40).optional().nullable(),
+  temperature: z.number().int().min(0).max(50).optional().nullable(),
   notes: z.string().max(4000).optional().nullable(),
 });
 export type PlantCreateInput = z.infer<typeof PlantCreateInput>;

@@ -3,6 +3,8 @@
 import { forwardRef } from "react";
 import type { InputHTMLAttributes, ReactNode, TextareaHTMLAttributes } from "react";
 import { cn } from "../lib/cn";
+import { Plus } from "../icons/Plus";
+import { Minus } from "../icons/Minus";
 
 /* ────────────────────────────────────────────────────────────────────────── */
 /* TextInput                                                                  */
@@ -119,14 +121,13 @@ export const NumberStepper = forwardRef<HTMLDivElement, NumberStepperProps>(func
         disabled={decDisabled}
         aria-label={`Diminuer ${label}`}
         className={cn(
-          "h-11 w-11 rounded-full bg-paper-50 border border-paper-300 shadow-paper",
-          "text-ink-800 text-xl leading-none",
+          "inline-flex items-center justify-center h-11 w-11 rounded-full bg-paper-50 border border-paper-300 shadow-paper text-ink-800",
           "transition-colors duration-180 ease-organic hover:bg-paper-100",
           "active:shadow-press disabled:opacity-40 disabled:cursor-not-allowed",
           "focus:outline-none focus-visible:ring-4 focus-visible:ring-terracotta-500/20",
         )}
       >
-        −
+        <Minus size={18} />
       </button>
       <div className="min-w-[5rem] text-center" aria-live="polite">
         <span className="font-serif text-3xl text-ink-800 tabular-nums">{value}</span>
@@ -138,14 +139,13 @@ export const NumberStepper = forwardRef<HTMLDivElement, NumberStepperProps>(func
         disabled={incDisabled}
         aria-label={`Augmenter ${label}`}
         className={cn(
-          "h-11 w-11 rounded-full bg-paper-50 border border-paper-300 shadow-paper",
-          "text-ink-800 text-xl leading-none",
+          "inline-flex items-center justify-center h-11 w-11 rounded-full bg-paper-50 border border-paper-300 shadow-paper text-ink-800",
           "transition-colors duration-180 ease-organic hover:bg-paper-100",
           "active:shadow-press disabled:opacity-40 disabled:cursor-not-allowed",
           "focus:outline-none focus-visible:ring-4 focus-visible:ring-terracotta-500/20",
         )}
       >
-        +
+        <Plus size={18} />
       </button>
     </div>
   );

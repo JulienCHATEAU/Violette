@@ -33,7 +33,7 @@ async function main() {
         lastWateredAt: new Date(now - 8 * day),
         sunlightExposure: "indirect_light",
         humidity: "high",
-        temperatureRange: "18-27°C",
+        temperature: 22,
         notes: "Vaporiser les feuilles 1x/semaine.",
       },
       {
@@ -46,7 +46,7 @@ async function main() {
         lastWateredAt: new Date(now - 3 * day),
         sunlightExposure: "full_sun",
         humidity: "low",
-        temperatureRange: "15-30°C",
+        temperature: 24,
         notes: "Laisser sécher le terreau entre deux arrosages.",
       },
       {
@@ -59,7 +59,7 @@ async function main() {
         lastWateredAt: new Date(now - 7 * day),
         sunlightExposure: "indirect_light",
         humidity: "medium",
-        temperatureRange: "18-24°C",
+        temperature: 21,
         notes: "Déteste qu'on le déplace.",
       },
     ],

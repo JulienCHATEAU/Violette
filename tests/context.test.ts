@@ -16,7 +16,7 @@ function mkPlant(daysSince: number, freq = 7): Plant {
     lastWateredAt: new Date(now.getTime() - daysSince * DAY),
     sunlightExposure: "indirect_light",
     humidity: "medium",
-    temperatureRange: null,
+    temperature: null,
     notes: null,
     photo: null,
     photoMime: null,

@@ -50,7 +50,7 @@ export default async function EditPlantPage({ params }: { params: { id: string }
           wateringFrequencyDays: plant.wateringFrequencyDays,
           sunlightExposure: plant.sunlightExposure as SunlightExposure,
           humidity: plant.humidity as HumidityLevel,
-          temperatureRange: plant.temperatureRange,
+          temperature: plant.temperature,
           notes: plant.notes,
         }}
       />

@@ -32,7 +32,7 @@ model Plant {
   lastWateredAt         DateTime @default(now())
   sunlightExposure      String   @default("indirect_light")
   humidity              String   @default("medium")
-  temperatureRange      String?
+  temperature           Int?
   notes                 String?
   photo                 Bytes?
   photoMime             String?

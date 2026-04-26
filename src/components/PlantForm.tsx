@@ -76,7 +76,7 @@ export function PlantForm({
     wateringFrequencyDays: 7,
     sunlightExposure: "indirect_light",
     humidity: "medium",
-    temperatureRange: "",
+    temperature: null,
     notes: "",
     ...initial,
   });
@@ -200,16 +200,20 @@ export function PlantForm({
                   value={(values.humidity ?? "medium") as HumidityValue}
                   onChange={(v) => set("humidity", v)}
                   options={HUMIDITY_OPTIONS}
-                  fullWidth
+                  orientation="vertical"
                 />
               </Field>
               <Field id="temp" label="Température">
-                <TextInput
-                  id="temp"
-                  placeholder="18-25°C"
-                  value={values.temperatureRange ?? ""}
-                  onChange={(e) => set("temperatureRange", e.target.value)}
-                />
+                <div className="flex justify-center pt-1">
+                  <NumberStepper
+                    label="Température en °C"
+                    value={values.temperature ?? 22}
+                    onChange={(n) => set("temperature", n)}
+                    min={0}
+                    max={50}
+                    unit="°C"
+                  />
+                </div>
               </Field>
             </FormSection>
 
@@ -255,7 +259,7 @@ export function PlantForm({
                 Annuler
               </Button>
               <Button type="submit" variant="cta" size="md" disabled={pending} className="flex-1">
-                {pending ? "Enregistrement…" : mode === "create" ? "Créer" : "Mettre à jour"}
+                {pending ? "Enregistrement…" : mode === "create" ? "Créer" : "Modifier"}
               </Button>
             </div>
 

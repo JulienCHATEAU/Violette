@@ -66,7 +66,7 @@ export default async function PlantDetailPage({ params }: { params: { id: string
           <ArrowLeft size={20} />
         </Link>
         <Link href={`/plants/${plant.id}/edit`}>
-          <Button variant="ghost" size="sm">Modifier</Button>
+          <Button variant="secondary" size="sm">Modifier</Button>
         </Link>
       </div>
 
@@ -125,7 +125,7 @@ export default async function PlantDetailPage({ params }: { params: { id: string
             {HUMIDITY_LABEL[plant.humidity] ?? plant.humidity}
           </Detail>
           <Detail icon={<Thermometer size={16} className="text-terracotta-500" />} label="Température">
-            {plant.temperatureRange ?? "—"}
+            {plant.temperature !== null && plant.temperature !== undefined ? `${plant.temperature}°C` : "—"}
           </Detail>
         </dl>
         {plant.description ? (
@@ -159,7 +159,7 @@ export default async function PlantDetailPage({ params }: { params: { id: string
               >
                 <span className="flex items-center gap-2">
                   <Droplet size={14} className="text-terracotta-400" />
-                  {new Date(log.wateredAt).toLocaleDateString("fr-FR", { dateStyle: "medium" })}
+                  {new Date(log.wateredAt).toLocaleString("fr-FR", { dateStyle: "medium", timeStyle: "short" })}
                 </span>
                 {log.note ? <span className="text-ink-400 text-xs">{log.note}</span> : null}
               </li>
