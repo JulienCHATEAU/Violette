@@ -1,6 +1,22 @@
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
+import { Fraunces, Plus_Jakarta_Sans } from "next/font/google";
 import { Nav } from "@/components/Nav";
+
+const fraunces = Fraunces({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
+  display: "swap",
+  variable: "--font-serif",
+});
+
+const jakarta = Plus_Jakarta_Sans({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  display: "swap",
+  variable: "--font-sans",
+});
 
 export const metadata: Metadata = {
   title: "Violette — mes plantes",
@@ -23,8 +39,8 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="fr">
-      <body className="min-h-screen flex flex-col">
+    <html lang="fr" className={`${fraunces.variable} ${jakarta.variable}`}>
+      <body className="min-h-screen flex flex-col font-sans">
         <main className="flex-1 w-full max-w-xl mx-auto px-6 sm:px-8 pt-8 pb-32">{children}</main>
         <Nav />
       </body>

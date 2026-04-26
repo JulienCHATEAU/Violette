@@ -25,3 +25,25 @@ body {
 }
 
 .safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+
+/* Design system — paper grain texture, used as a subtle background on cards/panels. */
+.paper-grain {
+  background-image:
+    radial-gradient(rgba(90, 74, 64, 0.04) 1px, transparent 1px),
+    radial-gradient(rgba(90, 74, 64, 0.03) 1px, transparent 1px);
+  background-size: 3px 3px, 7px 7px;
+  background-position: 0 0, 1px 2px;
+}
+
+/* Design system — Fraunces serif fine-tuning (stylistic sets + tighter tracking). */
+.font-serif { font-feature-settings: "ss01", "ss02"; letter-spacing: -0.01em; }
+
+/* Accessibility — global motion guard. Components also check this at runtime when needed. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
